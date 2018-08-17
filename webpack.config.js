@@ -92,17 +92,17 @@ module.exports = () => {
       new HtmlWebpackPlugin({
         template: path.join(__dirname, `${srcPath}/popup.html`),
         filename: 'popup.html',
-        chunks: ['popup']
+        chunks: ['popup', 'vendors']
       }),
       new HtmlWebpackPlugin({
         template: path.join(__dirname, `${srcPath}/options.html`),
         filename: 'options.html',
-        chunks: ['options']
+        chunks: ['options', 'vendors']
       }),
       new HtmlWebpackPlugin({
         template: path.join(__dirname, `${srcPath}/background.html`),
         filename: 'background.html',
-        chunks: ['background']
+        chunks: ['background', 'vendors']
       })
     ]
   };
