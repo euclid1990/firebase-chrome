@@ -2,12 +2,12 @@
   "name": "Firebase Chrome",
   "version": "1.0",
   "description": "Listen to new data in Firebase and show chrome notifications",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "permissions": ["activeTab", "storage"],
   "background": {
     "page": "background.html",
     "persistent": false
   },
-  "page_action": {
+  "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "img/icon_16.png",
