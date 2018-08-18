@@ -1,0 +1,89 @@
+@import '~materialize-css/dist/css/materialize.min.css';
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+
+/* Begin: Material Design Icons */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/materialicons.woff2) format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-fa-icons {
+  padding-left: 2px;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  &.prefix {
+    font-size: 1.67rem !important;
+  }
+}
+/* End: Material Design Icons */
+
+@mixin margin-left-right($left, $right) {
+    margin-left: $left;
+    margin-right: $right;
+}
+
+@mixin margin-top-bottom($top, $bottom) {
+    margin-top: $top;
+    margin-bottom: $bottom;
+}
+
+@mixin margin-top($top) {
+    margin-top: $top;
+}
+
+@mixin margin-bottom($bottom) {
+    margin-bottom: $bottom;
+}
+
+@mixin margin-left($top) {
+    margin-left: $top;
+}
+
+@mixin margin-right($top) {
+    margin-right: $top;
+}
+
+@mixin padding-left-right($left, $right) {
+    padding-left: $left;
+    padding-right: $right;
+}
+
+@mixin padding-top-bottom($top, $bottom) {
+    padding-top: $top;
+    padding-bottom: $bottom;
+}
+
+.margin-top-10 {
+    @include margin-top(10px);
+}
+
+.margin-top-20 {
+    @include margin-top(20px);
+}

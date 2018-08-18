@@ -2,7 +2,8 @@
   "name": "Firebase Chrome",
   "version": "1.0",
   "description": "Listen to new data in Firebase and show chrome notifications",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["notifications", "activeTab", "storage"],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "background": {
     "page": "background.html",
     "persistent": false
@@ -12,6 +13,7 @@
     "default_icon": {
       "16": "img/icon_16.png",
       "32": "img/icon_32.png",
+      "48": "img/icon_48.png",
       "64": "img/icon_64.png",
       "128": "img/icon_128.png"
     }
@@ -20,6 +22,7 @@
   "icons": {
     "16": "img/icon_16.png",
     "32": "img/icon_32.png",
+    "48": "img/icon_48.png",
     "64": "img/icon_64.png",
     "128": "img/icon_128.png"
   },

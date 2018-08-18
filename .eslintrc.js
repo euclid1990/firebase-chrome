@@ -19,6 +19,7 @@ module.exports = {
     'eol-last': ['error', 'always']
   },
   'globals': {
-    'chrome': true
+    'chrome': true,
+    'M' : true
   }
 };

@@ -1,1 +1,9 @@
-@import '~materialize-css/dist/css/materialize.min.css';
+@import 'common';
+
+body {
+    min-width:350px;
+}
+
+form .row {
+  margin: 20px auto 0;
+}

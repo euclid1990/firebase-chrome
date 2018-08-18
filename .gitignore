@@ -9,5 +9,6 @@
 # misc
 .DS_Store
 .env
+configs.*.js
 *.log
 *.hot-update.json

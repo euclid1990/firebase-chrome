@@ -1,5 +1,7 @@
+const _ = require('lodash');
 const path = require('path');
-const dotenv = require('dotenv').config(); /* eslint-disable-line no-unused-vars */
+const fs = require('fs');
+const dotenv = require('dotenv'); dotenv.config();
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -15,6 +17,32 @@ function env(e, d = '') {
   return process.env[e];
 }
 
+// Generate src/scripts/configs.[development|production].js secrets file
+function generateSecretConfig() {
+  const NODE_ENV = env('NODE_ENV', 'development');
+  const ENV_FILE = path.join(__dirname, '.env');
+  let configsPath = path.join(__dirname, `${srcPath}/scripts/configs.${NODE_ENV}.js`);
+  if (!fs.existsSync(ENV_FILE)) {
+    console.info('Please initialize .env (copy .env.example) before perform build.')
+    process.exit()
+  }
+  if (!fs.existsSync(configsPath)) {
+    let configs = dotenv.parse(fs.readFileSync(ENV_FILE, { encoding: 'utf-8' }));
+    let content = {}
+    _.forEach(configs, function(v, k) {
+      content[_.camelCase(k)] = v;
+    });
+    content = JSON.stringify(content);
+    content = `export default ${content};`;
+    fs.writeFileSync(configsPath, content);
+  }
+  return {
+    configs: configsPath
+  }
+}
+
+let aliasConfigs = generateSecretConfig();
+
 module.exports = () => {
   return {
     mode: env('NODE_ENV', 'development'),
@@ -27,6 +55,11 @@ module.exports = () => {
     output: {
       filename: devMode ? 'js/[name].js' : 'js/[name].[hash].js',
       path: path.resolve(__dirname, buildPath)
+    },
+    resolve: {
+      alias: Object.assign({
+        vue: 'vue/dist/vue.js'
+      }, aliasConfigs)
     },
     devtool: devMode ? 'inline-source-map' : false,
     module: {
@@ -42,9 +75,14 @@ module.exports = () => {
       {
         test: /\.scss$/,
         use: [
-        MiniCssExtractPlugin.loader,
-        'css-loader',
-        'sass-loader'
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../'
+            }
+          },
+          'css-loader',
+          'sass-loader'
         ]
       },
       {
@@ -63,7 +101,7 @@ module.exports = () => {
           loader: 'file-loader',
           options: {
             name: '[name].[ext]',
-            outputPath: 'fonts/'
+            outputPath: 'fonts',
           }
         }]
       }
