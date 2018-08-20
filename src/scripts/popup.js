@@ -29,4 +29,5 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
+  M.AutoInit();
 });

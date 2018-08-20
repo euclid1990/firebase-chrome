@@ -2,6 +2,7 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
+import Consts from './consts';
 
 export class Storage {
   extractMasterKey(key) {
@@ -100,7 +101,10 @@ export class Notification {
 export class Firebase {
   constructor(configs) {
     this.configs = configs;
-    this.app = firebase.initializeApp(this.configs);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(this.configs);
+    }
+    this.app = firebase.app();
   }
 
   static pickConfigs(obj) {
@@ -109,6 +113,16 @@ export class Firebase {
       return ~_.indexOf(firebaseInitKeys, key);
     });
     configs['databaseURL'] = obj.databaseUrl;
+    return configs;
+  }
+
+  static pickRealtimeDatabaseConfigs(obj) {
+    let realtimeDbInitKeys = ['collection', 'fieldTitle', 'fieldMessage'];
+    let configs = _.pickBy(obj, (value, key) => {
+      return ~_.indexOf(realtimeDbInitKeys, key);
+    });
+    configs['getNewItemBy'] = Consts.GET_NEW_ITEM_BY_GRAB_LIMIT;
+    configs['grabType'] = Consts.GRAB_LIMIT_TO_LAST;
     return configs;
   }
 }

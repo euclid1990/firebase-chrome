@@ -4,12 +4,17 @@
   <meta charset="UTF-8">
 </head>
 <body>
+  <div id="splash">
+    <div class="splash-spinner"></div>
+    <div class="splash-section splash-left"></div>
+    <div class="splash-section splash-right"></div>
+  </div>
   <div id="app">
     <nav>
       <div class="container nav-wrapper">
         <a href="#" class="brand-logo">Options</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="#"><i class="material-icons">close</i></a></li>
+          <li v-on:click="close"><a href="#"><i class="material-icons">close</i></a></li>
         </ul>
       </div>
     </nav>
@@ -17,8 +22,8 @@
       <div class="z-depth-1 grey lighten-4 row">
         <div>
           <ul class="tabs">
-            <li class="tab col s6"><a href="#firebase"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Firebase</a></li>
-            <li class="tab col s6"><a href="#realtime_database"><span class="material-fa-icons"><i class="fas fa-hdd"></i></span> Realtime Database</a></li>
+            <li v-on:click="errors = []" class="tab col s6"><a href="#firebase"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Firebase</a></li>
+            <li v-on:click="errors = []" class="tab col s6"><a href="#realtime-database"><span class="material-fa-icons"><i class="fas fa-hdd"></i></span> Realtime Database</a></li>
           </ul>
         </div>
         <div class="col s12 margin-top-10 form-errors">
@@ -65,33 +70,31 @@
             </div>
           </form>
         </div>
-        <div id="realtime_database">
-          <form action="#" class="col s12">
+        <div id="realtime-database">
+          <form action="#" @submit="realtimeDatabaseForm" class="col s12">
             <div class="row margin-top-10">
               <div class="input-field col s9">
                 <i class="material-icons prefix">device_hub</i>
-                <select>
-                  <option value="" disabled selected>Choose collections</option>
-                  <option value="1">Option 1</option>
-                  <option value="2">Option 2</option>
-                  <option value="3">Option 3</option>
+                <select v-model="realtimeDatabase.collection">
+                  <option value="" disabled>Choose collections</option>
+                  <option v-for="collection in realtimeDatabase.collections" v-bind:value="collection" :selected="realtimeDatabase.collection === collection">{{ collection }}</option>
                 </select>
                 <label>Firebase Collection</label>
               </div>
               <div class="input-field col s3">
-                <a class="waves-effect waves-light btn light-green disabled"><i class="fas fa-circle-notch fa-spin left"></i><i class="material-icons left">cloud_download</i>Fetch</a>
+                <a v-on:click="fetchCollections" v-bind:class="{ disabled: isFetching }" class="waves-effect waves-light btn light-green"><i v-show="isFetching" class="fas fa-circle-notch fa-spin left"></i><i class="material-icons left">cloud_download</i>Fetch</a>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s6">
                 <i class="material-icons prefix">title</i>
-                <input id="notification_title" placeholder="Input Field Name To Set Notification Title" type="text" class="validate">
-                <label for="notification_title">Notification Title</label>
+                <input id="notification_title" v-model="realtimeDatabase.fieldTitle" placeholder="Input Field Name To Set Notification Title" type="text" class="validate">
+                <label for="notification_title">Notification Title Field</label>
               </div>
               <div class="input-field col s6">
                 <i class="material-icons prefix">message</i>
-                <input id="notification_message" placeholder="Input Field Name To Set Notification Message" type="text" class="validate">
-                <label for="notification_message">Notification Message</label>
+                <input id="notification_message" v-model="realtimeDatabase.fieldMessage" placeholder="Input Field Name To Set Notification Message" type="text" class="validate">
+                <label for="notification_message">Notification Message Field</label>
               </div>
             </div>
             <div class="row">
@@ -100,37 +103,40 @@
                 <div class="input-field inline">
                   <div class="get-new-item-by-checkbox">
                     <label>
-                      <input name="group1" type="radio" />
+                      <input name="get_new_item_by" v-model="realtimeDatabase.getNewItemBy" type="radio" v-bind:value="consts.GET_NEW_ITEM_BY_GRAB_LIMIT" />
                       <span>Specific first or last number of children</span>
                     </label>
                   </div>
                   <div class="get-new-item-by-checkbox margin-left-10">
                     <label>
-                      <input name="group1" type="radio" checked />
+                      <input name="get_new_item_by" v-model="realtimeDatabase.getNewItemBy" type="radio" v-bind:value="consts.GET_NEW_ITEM_BY_ORDER_BY" />
                       <span>Ordered by the specified child key</span>
                     </label>
                   </div>
                 </div>
               </div>
-              <div class="input-field col s6">
+              <div v-show="realtimeDatabase.getNewItemBy === consts.GET_NEW_ITEM_BY_GRAB_LIMIT" class="input-field col s6">
                 <i class="material-icons prefix">import_export</i>
-                <select>
+                <select v-model="realtimeDatabase.grabType">
                   <option value="" disabled selected>Choose grab types</option>
-                  <option value="1">limitToFirst(1)</option>
-                  <option value="2">limitToLast(1)</option>
+                  <option v-bind:value="consts.GRAB_LIMIT_TO_FIRST">limitToFirst(1)</option>
+                  <option v-bind:value="consts.GRAB_LIMIT_TO_LAST">limitToLast(1)</option>
                 </select>
                 <label for="notification_message">Grab type</label>
               </div>
-              <div class="input-field col s6">
+              <div v-show="realtimeDatabase.getNewItemBy === consts.GET_NEW_ITEM_BY_ORDER_BY" class="input-field col s6">
                 <span class="material-fa-icons prefix"><i class="fas fa-sort"></i></span>
-                <input id="notification_title" placeholder="Input Timestamp Field Name To Sort" type="text" class="validate">
-                <label for="notification_title">Order By</label>
+                <input id="notification_title" v-model="realtimeDatabase.orderBy" placeholder="Input Timestamp Field Name To Sort" type="text" class="validate">
+                <label for="notification_title" >Order By</label>
+              </div>
+              <div class="input-field col s3">
+                <a v-on:click="testPush" v-bind:class="{ disabled: isTesting }" class="waves-effect waves-light btn green darken-1"><i class="material-icons left">wifi</i>Test</a>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
                 <center>
-                  <button type='submit' name='save_notification' class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
+                  <button type='submit' name='save_notification' v-bind:class="{ disabled: isSaving }" class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
                 </center>
               </div>
             </div>
