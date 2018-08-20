@@ -1,11 +1,13 @@
 import $ from 'jquery'; // eslint-disable-line no-unused-vars
 import Vue from 'vue';
 import _ from 'lodash';
-import { Storage, Notification, Firebase, FirebaseDatabase } from './utils';
-import 'materialize-css/dist/js/materialize.js';
+import Vuetify from 'vuetify';
 import '../stylesheets/options.scss';
+import { Storage, Notification, Firebase, FirebaseDatabase } from './utils';
 
 const storage = new Storage();
+
+Vue.use(Vuetify)
 
 const app = new Vue({ // eslint-disable-line no-unused-vars
   el: '#app',
@@ -69,7 +71,7 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
       }
       storage.set('firebase', this.firebase).then((result) => {
         this.isSaving = false;
-        M.toast({html: 'Saved successfully', classes: 'rounded'})
+        // M.toast({html: 'Saved successfully', classes: 'rounded'})
       });
     }
   },
@@ -77,7 +79,6 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
     this.init();
   },
   mounted: function() {
-    M.AutoInit();
   }
 });
 

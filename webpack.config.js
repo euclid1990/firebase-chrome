@@ -69,8 +69,19 @@ module.exports = () => {
         loader: 'eslint-loader'
       },
       {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+      {
         test: /\.html$/,
         loader: 'html-loader',
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
       },
       {
         test: /\.scss$/,

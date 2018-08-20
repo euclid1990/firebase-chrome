@@ -5,22 +5,36 @@
 </head>
 <body>
   <div id="app">
-    <nav>
-      <div class="container nav-wrapper">
-        <a href="#" class="brand-logo">Options</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="#"><i class="material-icons">close</i></a></li>
-        </ul>
-      </div>
-    </nav>
-    <div class="container margin-top-20">
-      <div class="z-depth-1 grey lighten-4 row">
-        <div>
-          <ul class="tabs">
-            <li class="tab col s6"><a href="#firebase"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Firebase</a></li>
-            <li class="tab col s6"><a href="#realtime_database"><span class="material-fa-icons"><i class="fas fa-hdd"></i></span> Realtime Database</a></li>
-          </ul>
-        </div>
+    <v-app>
+      <v-toolbar dark color="red lighten-2">
+        <v-toolbar-title class="white--text">Options</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items class="hidden-sm-and-down">
+          <v-btn flat>
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <v-content>
+        <v-container>
+          <div class="z-depth-1 grey lighten-4 row">
+            <v-tabs
+            color="grey lighten-5"
+            grow
+            slider-color="teal lighten-3"
+            >
+            <v-tab
+            href="#firebase"
+            class="grey--text text--darken-1"
+            >
+            <span class="material-fa-icons margin-right-10"><i class="fas fa-fire"></i></span> Firebase
+          </v-tab>
+          <v-tab
+          href="#realtime_database"
+          class="grey--text text--darken-1"
+          >
+          <span class="material-fa-icons margin-right-10"><i class="fas fa-hdd"></i></span> Realtime Database
+        </v-tab>
         <div class="col s12 margin-top-10 form-errors">
           <div v-if="errors.length">
             <strong class="red-text">Please correct the following errors</strong>
@@ -29,115 +43,122 @@
             </ul>
           </div>
         </div>
-        <div id="firebase">
-          <form action="#" @submit="firebaseForm" class="col s12">
-            <div class="row margin-top-10">
-              <div class="input-field col s6">
-                <i class="material-icons prefix">vpn_key</i>
-                <input id="api_key" v-model="firebase.apiKey" placeholder="Input Firebase Api Key" type="text" class="validate">
-                <label for="api_key">Firebase Api Key</label>
-              </div>
-              <div class="input-field col s6">
-                <i class="material-icons prefix">domain</i>
-                <input id="auth_domain" v-model="firebase.authDomain" placeholder="Input Firebase Auth Domain" type="text" class="validate">
-                <label for="auth_domain">Firebase Auth Domain</label>
-              </div>
+        <v-tab-item
+        :id="'firebase'"
+        >
+        <v-form action="#" @submit="firebaseForm" class="col s12">
+          <div class="row margin-top-10">
+            <div class="input-field col s6">
+              <i class="material-icons prefix">vpn_key</i>
+              <input id="api_key" v-model="firebase.apiKey" placeholder="Input Firebase Api Key" type="text" class="validate">
+              <label for="api_key">Firebase Api Key</label>
             </div>
-            <div class="row">
-              <div class="input-field col s6">
-                <span class="material-fa-icons prefix"><i class="fas fa-database"></i></span>
-                <!-- <i class="material-icons prefix">domain</i> -->
-                <input id="database_url" v-model="firebase.databaseURL" placeholder="Input Firebase Database Url" type="text" class="validate">
-                <label for="database_url">Firebase Database URL</label>
-              </div>
-              <div class="input-field col s6">
-                <i class="material-icons prefix">local_drink</i>
-                <input id="storage_bucket" v-model="firebase.storageBucket" placeholder="Input Firebase Storage Bucket" type="text" class="validate">
-                <label for="storage_bucket">Firebase Storage Bucket</label>
-              </div>
+            <div class="input-field col s6">
+              <i class="material-icons prefix">domain</i>
+              <input id="auth_domain" v-model="firebase.authDomain" placeholder="Input Firebase Auth Domain" type="text" class="validate">
+              <label for="auth_domain">Firebase Auth Domain</label>
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <center>
-                  <button type='submit' name='save_firebase' v-bind:class="{ disabled: isSaving }" class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
-                </center>
-              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s6">
+              <span class="material-fa-icons prefix"><i class="fas fa-database"></i></span>
+              <!-- <i class="material-icons prefix">domain</i> -->
+              <input id="database_url" v-model="firebase.databaseURL" placeholder="Input Firebase Database Url" type="text" class="validate">
+              <label for="database_url">Firebase Database URL</label>
             </div>
-          </form>
+            <div class="input-field col s6">
+              <i class="material-icons prefix">local_drink</i>
+              <input id="storage_bucket" v-model="firebase.storageBucket" placeholder="Input Firebase Storage Bucket" type="text" class="validate">
+              <label for="storage_bucket">Firebase Storage Bucket</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <center>
+                <button type='submit' name='save_firebase' v-bind:class="{ disabled: isSaving }" class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
+              </center>
+            </div>
+          </div>
+        </v-form>
+      </v-tab-item>
+      <v-tab-item
+      :id="'realtime_database'"
+      >
+      <form action="#" class="col s12">
+        <div class="row margin-top-10">
+          <div class="input-field col s9">
+            <i class="material-icons prefix">device_hub</i>
+            <select>
+              <option value="" disabled selected>Choose collections</option>
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+            </select>
+            <label>Firebase Collection</label>
+          </div>
+          <div class="input-field col s3">
+            <a class="waves-effect waves-light btn light-green disabled"><i class="fas fa-circle-notch fa-spin left"></i><i class="material-icons left">cloud_download</i>Fetch</a>
+          </div>
         </div>
-        <div id="realtime_database">
-          <form action="#" class="col s12">
-            <div class="row margin-top-10">
-              <div class="input-field col s9">
-                <i class="material-icons prefix">device_hub</i>
-                <select>
-                  <option value="" disabled selected>Choose collections</option>
-                  <option value="1">Option 1</option>
-                  <option value="2">Option 2</option>
-                  <option value="3">Option 3</option>
-                </select>
-                <label>Firebase Collection</label>
-              </div>
-              <div class="input-field col s3">
-                <a class="waves-effect waves-light btn light-green disabled"><i class="fas fa-circle-notch fa-spin left"></i><i class="material-icons left">cloud_download</i>Fetch</a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s6">
-                <i class="material-icons prefix">title</i>
-                <input id="notification_title" placeholder="Input Field Name To Set Notification Title" type="text" class="validate">
-                <label for="notification_title">Notification Title</label>
-              </div>
-              <div class="input-field col s6">
-                <i class="material-icons prefix">message</i>
-                <input id="notification_message" placeholder="Input Field Name To Set Notification Message" type="text" class="validate">
-                <label for="notification_message">Notification Message</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <span class="get-new-item-by">Get new item by</span>
-                <div class="input-field inline">
-                  <div class="get-new-item-by-checkbox">
-                    <label>
-                      <input name="group1" type="radio" />
-                      <span>Specific first or last number of children</span>
-                    </label>
-                  </div>
-                  <div class="get-new-item-by-checkbox margin-left-10">
-                    <label>
-                      <input name="group1" type="radio" checked />
-                      <span>Ordered by the specified child key</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div class="input-field col s6">
-                <i class="material-icons prefix">import_export</i>
-                <select>
-                  <option value="" disabled selected>Choose grab types</option>
-                  <option value="1">limitToFirst(1)</option>
-                  <option value="2">limitToLast(1)</option>
-                </select>
-                <label for="notification_message">Grab type</label>
-              </div>
-              <div class="input-field col s6">
-                <span class="material-fa-icons prefix"><i class="fas fa-sort"></i></span>
-                <input id="notification_title" placeholder="Input Timestamp Field Name To Sort" type="text" class="validate">
-                <label for="notification_title">Order By</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <center>
-                  <button type='submit' name='save_notification' class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
-                </center>
-              </div>
-            </div>
-          </form>
+        <div class="row">
+          <div class="input-field col s6">
+            <i class="material-icons prefix">title</i>
+            <input id="notification_title" placeholder="Input Field Name To Set Notification Title" type="text" class="validate">
+            <label for="notification_title">Notification Title</label>
+          </div>
+          <div class="input-field col s6">
+            <i class="material-icons prefix">message</i>
+            <input id="notification_message" placeholder="Input Field Name To Set Notification Message" type="text" class="validate">
+            <label for="notification_message">Notification Message</label>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <span class="get-new-item-by">Get new item by</span>
+            <div class="input-field inline">
+              <div class="get-new-item-by-checkbox">
+                <label>
+                  <input name="group1" type="radio" />
+                  <span>Specific first or last number of children</span>
+                </label>
+              </div>
+              <div class="get-new-item-by-checkbox margin-left-10">
+                <label>
+                  <input name="group1" type="radio" checked />
+                  <span>Ordered by the specified child key</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="input-field col s6">
+            <i class="material-icons prefix">import_export</i>
+            <select>
+              <option value="" disabled selected>Choose grab types</option>
+              <option value="1">limitToFirst(1)</option>
+              <option value="2">limitToLast(1)</option>
+            </select>
+            <label for="notification_message">Grab type</label>
+          </div>
+          <div class="input-field col s6">
+            <span class="material-fa-icons prefix"><i class="fas fa-sort"></i></span>
+            <input id="notification_title" placeholder="Input Timestamp Field Name To Sort" type="text" class="validate">
+            <label for="notification_title">Order By</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <center>
+              <button type='submit' name='save_notification' class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
+            </center>
+          </div>
+        </div>
+      </form>
+    </v-tab-item>
+  </v-tabs>
+</div>
+</v-container>
+</v-content>
+</v-app>
+</div>
 </body>
 </html>

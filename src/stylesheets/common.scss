@@ -1,5 +1,5 @@
-@import '~materialize-css/dist/css/materialize.min.css';
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
+@import '~vuetify/dist/vuetify';
 
 body {
   font-size: 16px;
@@ -106,6 +106,14 @@ body {
 
 .margin-bottom-0 {
   @include margin-bottom(0px);
+}
+
+.margin-right-10 {
+  @include margin-right(10px);
+}
+
+.v-toolbar__content {
+  @extend .container;
 }
 
 .form-errors {
