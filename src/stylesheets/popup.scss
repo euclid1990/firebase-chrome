@@ -4,6 +4,10 @@ body {
     min-width:350px;
 }
 
+.row.content {
+  margin-bottom: 0;
+}
+
 form .row {
-  margin: 20px auto 0;
+  margin: 0 auto;
 }

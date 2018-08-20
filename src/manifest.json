@@ -3,10 +3,10 @@
   "version": "1.0",
   "description": "Listen to new data in Firebase and show chrome notifications",
   "permissions": ["notifications", "activeTab", "storage"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com 'unsafe-eval'; object-src 'self'",
   "background": {
     "page": "background.html",
-    "persistent": false
+    "persistent": true
   },
   "browser_action": {
     "default_popup": "popup.html",

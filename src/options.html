@@ -17,21 +17,29 @@
       <div class="z-depth-1 grey lighten-4 row">
         <div>
           <ul class="tabs">
-            <li class="tab col s6"><a href="#firebase">Firebase</a></li>
-            <li class="tab col s6"><a href="#notification">Notification</a></li>
+            <li class="tab col s6"><a href="#firebase"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Firebase</a></li>
+            <li class="tab col s6"><a href="#realtime_database"><span class="material-fa-icons"><i class="fas fa-hdd"></i></span> Realtime Database</a></li>
           </ul>
         </div>
+        <div class="col s12 margin-top-10 form-errors">
+          <div v-if="errors.length">
+            <strong class="red-text">Please correct the following errors</strong>
+            <ul class="margin-left-10 margin-top-0 margin-bottom-0">
+              <li v-for="error in errors">{{ error }}</li>
+            </ul>
+          </div>
+        </div>
         <div id="firebase">
-          <form action="#" class="col s12">
+          <form action="#" @submit="firebaseForm" class="col s12">
             <div class="row margin-top-10">
               <div class="input-field col s6">
                 <i class="material-icons prefix">vpn_key</i>
-                <input id="api_key" placeholder="Input Firebase Api Key" type="text" class="validate">
+                <input id="api_key" v-model="firebase.apiKey" placeholder="Input Firebase Api Key" type="text" class="validate">
                 <label for="api_key">Firebase Api Key</label>
               </div>
               <div class="input-field col s6">
                 <i class="material-icons prefix">domain</i>
-                <input id="auth_domain" placeholder="Input Firebase Auth Domain" type="text" class="validate">
+                <input id="auth_domain" v-model="firebase.authDomain" placeholder="Input Firebase Auth Domain" type="text" class="validate">
                 <label for="auth_domain">Firebase Auth Domain</label>
               </div>
             </div>
@@ -39,25 +47,25 @@
               <div class="input-field col s6">
                 <span class="material-fa-icons prefix"><i class="fas fa-database"></i></span>
                 <!-- <i class="material-icons prefix">domain</i> -->
-                <input id="database_url" placeholder="Input Firebase Database Url" type="text" class="validate">
+                <input id="database_url" v-model="firebase.databaseURL" placeholder="Input Firebase Database Url" type="text" class="validate">
                 <label for="database_url">Firebase Database URL</label>
               </div>
               <div class="input-field col s6">
                 <i class="material-icons prefix">local_drink</i>
-                <input id="storage_bucket" placeholder="Input Firebase Storage Bucket" type="text" class="validate">
+                <input id="storage_bucket" v-model="firebase.storageBucket" placeholder="Input Firebase Storage Bucket" type="text" class="validate">
                 <label for="storage_bucket">Firebase Storage Bucket</label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
                 <center>
-                  <button type='submit' name='save_firebase' class='btn btn-large waves-effect indigo'><i class="fas fa-cog fa-spin left"></i>Save</button>
+                  <button type='submit' name='save_firebase' v-bind:class="{ disabled: isSaving }" class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
                 </center>
               </div>
             </div>
           </form>
         </div>
-        <div id="notification">
+        <div id="realtime_database">
           <form action="#" class="col s12">
             <div class="row margin-top-10">
               <div class="input-field col s9">
@@ -88,8 +96,41 @@
             </div>
             <div class="row">
               <div class="input-field col s12">
+                <span class="get-new-item-by">Get new item by</span>
+                <div class="input-field inline">
+                  <div class="get-new-item-by-checkbox">
+                    <label>
+                      <input name="group1" type="radio" />
+                      <span>Specific first or last number of children</span>
+                    </label>
+                  </div>
+                  <div class="get-new-item-by-checkbox margin-left-10">
+                    <label>
+                      <input name="group1" type="radio" checked />
+                      <span>Ordered by the specified child key</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">import_export</i>
+                <select>
+                  <option value="" disabled selected>Choose grab types</option>
+                  <option value="1">limitToFirst(1)</option>
+                  <option value="2">limitToLast(1)</option>
+                </select>
+                <label for="notification_message">Grab type</label>
+              </div>
+              <div class="input-field col s6">
+                <span class="material-fa-icons prefix"><i class="fas fa-sort"></i></span>
+                <input id="notification_title" placeholder="Input Timestamp Field Name To Sort" type="text" class="validate">
+                <label for="notification_title">Order By</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
                 <center>
-                  <button type='submit' name='save_notification' class='btn btn-large waves-effect indigo'><i class="fas fa-cog fa-spin left"></i>Save</button>
+                  <button type='submit' name='save_notification' class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
                 </center>
               </div>
             </div>

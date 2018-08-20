@@ -1,3 +1,5 @@
+import firebase from 'firebase/app';
+import 'firebase/database';
 import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
 
@@ -92,5 +94,121 @@ export class Notification {
 
   close() {
     chrome.notifications.clear(this.id, () => {});
+  }
+}
+
+export class Firebase {
+  constructor(configs) {
+    this.configs = configs;
+    this.app = firebase.initializeApp(this.configs);
+  }
+
+  static pickConfigs(obj) {
+    let firebaseInitKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId'];
+    let configs = _.pickBy(obj, (value, key) => {
+      return ~_.indexOf(firebaseInitKeys, key);
+    });
+    configs['databaseURL'] = obj.databaseUrl;
+    return configs;
+  }
+}
+
+export class FirebaseDatabase extends Firebase {
+  constructor(configs) {
+    super(configs);
+    this.database = this.app.database();
+  }
+
+  /**
+   * To read a snapshot of your data without listening for changes
+   */
+  read(ref) {
+    return this.database.ref(ref).once('value');
+  }
+
+  /**
+   * To save data to a specified reference, replacing any existing data at that path.
+   */
+  set(ref, id, data) {
+    return this.database.ref(`${ref}/${id}`).set(data);
+  }
+
+  /**
+   * To adding data to a collection of items
+   */
+  push(ref, data) {
+    return this.database.ref(ref).push().set(data);
+  }
+
+  /**
+   * To simultaneously write to specific children of a node without overwriting other child nodes
+   *
+   * updates['/posts/' + newPostKey] = postData;
+   * updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+   */
+  update(updates) {
+    return this.database.ref().update(updates);
+  }
+
+  /**
+   *
+   */
+  transaction(ref, transactionUpdate) {
+    return this.database.ref(ref).transaction(transactionUpdate);
+  }
+
+  /**
+   * To read data at a path and listen for changes
+   */
+  on(ref, eventType, cb) {
+    return this.database.ref(ref).on(eventType, (snapshot) => {
+      cb && cb(snapshot);
+    });
+  }
+
+  /**
+   * To remove a callback previously attached on a reference
+   * Calling off() on a parent listener does not automatically remove listeners registered on its child nodes
+   *
+   * eventType: "value", "child_added", "child_changed", "child_removed", or "child_moved."
+   */
+  off(ref, eventType = undefined) {
+    if (eventType === undefined) {
+      return this.database.ref(ref).off();
+    }
+    return this.database.ref(ref).off(eventType);
+  }
+
+  /**
+   * To remove a single listener on a reference
+   * Calling off() on a parent listener does not automatically remove listeners registered on its child nodes
+   */
+  remove(ref) {
+    return this.database.ref(ref).remove();
+  }
+
+  /**
+   * Fetching all collections name in Firebase
+   */
+  getCollectionName(ref = '/') {
+    return new Promise((resolve, reject) => {
+      this.database.ref(ref).once('value')
+        .then((snapshot) => {
+          let collections = _.keys(snapshot.val());
+          resolve(collections);
+        })
+        .catch(function(error) {
+          reject(error);
+        });
+    });
+  }
+
+  /**
+   * To watching added event from the bottom of a list (descending order)
+   */
+  onNewChildAdded(ref, limitToLast, cb) {
+    return this.database.ref(ref).limitToLast(limitToLast).on('child_added', (snapshot, prevChildKey) => {
+      cb && cb(snapshot, prevChildKey);
+    });
   }
 }
