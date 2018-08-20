@@ -2,8 +2,6 @@ import $ from 'jquery';
 import 'materialize-css/dist/js/materialize.js';
 import '../stylesheets/popup.scss';
 
-M.AutoInit();
-
 // eslint-disable-line no-unused-vars
 function openOptions() {
   chrome.tabs.create({'url': 'options.html'});
@@ -28,6 +26,6 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  init();
   M.AutoInit();
+  init();
 });

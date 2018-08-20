@@ -1,13 +1,19 @@
 @import 'common';
 
 body {
-    min-width:350px;
+  margin: 0 auto;
+  width: 350px;
 }
 
 .row.content {
-  margin-bottom: 0;
+  margin-bottom: 10px;
 }
 
 form .row {
-  margin: 0 auto;
+  margin-bottom: 0;
+}
+
+.input-switch {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
