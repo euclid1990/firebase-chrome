@@ -17,3 +17,50 @@ form .row {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+.progress {
+  margin: 0;
+}
+
+.message {
+  .message-letter {
+    animation-iteration-count: infinite;
+    animation-name: from-black-to-green, disappear;
+    animation-duration: 1.75s, 1.75s;
+    animation-direction: normal, normal;
+    animation-fill-mode: forwards, forwards;
+  }
+
+  @for $n from (35)*-1 through -1 {
+    span:nth-child(#{abs($n)}) {
+      animation-delay: $n * 0.05s + 1.75s, abs($n) * 0.05s + 1.75s
+    }
+  }
+
+  @keyframes from-black-to-green {
+    0% {
+      color: #333;
+    }
+    100% {
+      color: #00b894;
+    }
+  }
+
+  @keyframes from-green-to-black {
+    0% {
+      color: #00b894;
+    }
+    100% {
+      color: #333;
+    }
+  }
+
+  @keyframes disappear {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}

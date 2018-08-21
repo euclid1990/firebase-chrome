@@ -30,9 +30,6 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
       grabType: Consts.GRAB_LIMIT_TO_LAST,
       orderBy: ''
     },
-    settings: {
-      on: true
-    },
     consts: Consts
   },
   methods: {
@@ -192,7 +189,4 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
     let elems = document.querySelectorAll('select');
     M.FormSelect.init(elems, {});
   }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
 });

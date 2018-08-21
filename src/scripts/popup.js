@@ -1,31 +1,58 @@
-import $ from 'jquery';
+import $ from 'jquery'; // eslint-disable-line no-unused-vars
+import Vue from 'vue';
+import _ from 'lodash';
+import Consts from './consts';
+import { Storage } from './utils';
 import 'materialize-css/dist/js/materialize.js';
 import '../stylesheets/popup.scss';
 
-// eslint-disable-line no-unused-vars
-function openOptions() {
-  chrome.tabs.create({'url': 'options.html'});
+const storage = new Storage();
+
+async function readFromStorage() {
+  let settings = await storage.get('settings');
+  return _.assign({
+    enableNotification: true,
+    autoClose: false
+  }, settings);
 }
 
-function init() {
-  $('#nav-options').on('click', (e) => {
-    openOptions();
-    // let id = uuid();
-    // var opt = {
-    //   type: 'basic',
-    //   title: 'Title Message',
-    //   message: 'Message for the user.' + id,
-    //   iconUrl: 'img/success.png'
-    // };
-    // console.log(12);
-    // chrome.notifications.create(id, opt, function() {});
-    // setTimeout(() => {
-    //   chrome.notifications.clear(id, () => { console.log(`Closed ${id}`); });
-    // }, 2000);
+readFromStorage().then((result) => {
+  const app = new Vue({ // eslint-disable-line no-unused-vars
+    el: '#app',
+    data: {
+      message: '',
+      settings: {
+        enableNotification: result.enableNotification,
+        autoClose: result.autoClose
+      },
+      consts: Consts
+    },
+    watch: {
+      // whenever question changes, this function will run
+      settings: {
+        handler: function(newSettings, oldSettings) {
+          this.message = 'Waiting for you to stop changing...';
+          this.debouncedChangeSetting();
+        },
+        immediate: false,
+        deep: true
+      }
+    },
+    methods: {
+      changeSetting: function() {
+        storage.set('settings', this.settings).then((result) => {
+          this.message = '';
+        });
+      },
+      openOptions: function() {
+        chrome.tabs.create({'url': 'options.html'});
+      }
+    },
+    created: function() {
+      this.debouncedChangeSetting = _.debounce(this.changeSetting, 500);
+    },
+    mounted: function() {
+      M.AutoInit();
+    }
   });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  M.AutoInit();
-  init();
 });
