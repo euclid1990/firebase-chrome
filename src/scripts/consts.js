@@ -5,5 +5,8 @@ export default {
   GRAB_LIMIT_TO_LAST: 2,
   COLLECTION: 'notifications',
   FIELD_TITLE: 'title',
-  FIELD_MESSAGE: 'message'
+  FIELD_MESSAGE: 'message',
+  ENABLE_NOTIFICATION: true,
+  AUTO_CLOSE_NOTIFICATION: false,
+  CLOSE_NOTIFICATION_TIMEOUT: 2000
 };

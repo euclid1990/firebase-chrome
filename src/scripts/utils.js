@@ -40,6 +40,22 @@ export class Storage {
     });
   }
 
+  setWithoutOverwriting(key, value) {
+    console.log(key);
+    let masterKey = this.extractMasterKey(key);
+    return new Promise((resolve, reject) => {
+      this.get(masterKey, {}).then((result) => {
+        let c = {}; c[masterKey] = result;
+        let i = _.set({}, key, value);
+        let n = _.merge(i, c);
+        chrome.storage.sync.set(n, () => {
+          console.log(`[SET WITHOUT OVERWRITING] storage.${key} = ${JSON.stringify(value)}.`);
+          resolve(true);
+        });
+      });
+    });
+  }
+
   remove(key) {
     let keys = key.split('.');
     let masterKey = keys[0];
@@ -222,6 +238,24 @@ export class FirebaseDatabase extends Firebase {
    */
   onNewChildAdded(ref, limitToLast, cb) {
     return this.database.ref(ref).limitToLast(limitToLast).on('child_added', (snapshot, prevChildKey) => {
+      cb && cb(snapshot, prevChildKey);
+    });
+  }
+
+  /**
+   * To watching value changed event from the first of a list (ascending order)
+   */
+  onFirstChildUpdated(ref, limitToFirst, cb) {
+    return this.database.ref(ref).limitToFirst(limitToFirst).on('child_changed', (snapshot) => {
+      cb && cb(snapshot);
+    });
+  }
+
+  /**
+   * To watching new added event from the item that have created at timestamp > startedAt
+   */
+  onAfterStartAtChild(ref, field, startedAt, cb) {
+    return this.database.ref(ref).orderByChild(field).startAt(startedAt).on('child_added', (snapshot, prevChildKey) => {
       cb && cb(snapshot, prevChildKey);
     });
   }

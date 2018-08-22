@@ -50,8 +50,10 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
       }
 
       storage.set('firebase', this.firebase).then((result) => {
-        this.isSaving = false;
-        M.toast({html: 'Saved successfully', classes: 'rounded'});
+        chrome.runtime.sendMessage({ configUpdated: true }, (response) => {
+          this.isSaving = false;
+          M.toast({html: 'Saved successfully', classes: 'rounded'});
+        });
       });
     },
     firebaseValidate: function() {
@@ -93,10 +95,12 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
         this.isSaving = false;
         return;
       }
-      console.log(this.realtimeDatabase);
+
       storage.set('realtimeDatabase', this.realtimeDatabase).then((result) => {
-        this.isSaving = false;
-        M.toast({html: 'Saved successfully', classes: 'rounded'});
+        chrome.runtime.sendMessage({ configUpdated: true }, (response) => {
+          this.isSaving = false;
+          M.toast({html: 'Saved successfully', classes: 'rounded'});
+        });
       });
     },
     realtimeDatabaseValidate: function() {

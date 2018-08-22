@@ -1,46 +1,29 @@
 import configs from 'configs';
-import Consts from './consts';
-import { Storage, Notification, Firebase, FirebaseDatabase } from './utils';
+import { Process } from './process';
+import { Storage, Firebase } from './utils';
 import '../stylesheets/background.scss';
+
+var p = new Process();
 
 chrome.runtime.onInstalled.addListener(async () => {
   let storage = new Storage();
   let firebaseConfigs = Firebase.pickConfigs(configs);
   let realtimeDatabaseConfigs = Firebase.pickRealtimeDatabaseConfigs(configs);
-  await storage.set('firebase', firebaseConfigs);
-  await storage.set('realtimeDatabase', realtimeDatabaseConfigs);
+  let settings = Process.pickSettingConfigs();
+  await storage.setWithoutOverwriting('firebase', firebaseConfigs);
+  await storage.setWithoutOverwriting('realtimeDatabase', realtimeDatabaseConfigs);
+  await storage.setWithoutOverwriting('settings', settings);
+  p.runListener();
 });
 
-// chrome.runtime.onStartup.addListener(async () => {});
-async function listenFirebase() {
-  let storage = new Storage();
-  let firebase = await storage.get('firebase');
-  let realtimeDatabase = await storage.get('realtimeDatabase');
-  let ref = realtimeDatabase.collection;
-  let fbDatabase = new FirebaseDatabase(firebase);
-  let init = false;
+chrome.runtime.onStartup.addListener(async () => {
+  p.runListener();
+});
 
-  if (realtimeDatabase.getNewItemBy === Consts.GET_NEW_ITEM_BY_GRAB_LIMIT) {
-    switch (realtimeDatabase.grabType) {
-      case Consts.GRAB_LIMIT_TO_FIRST:
-        break;
-      case Consts.GRAB_LIMIT_TO_LAST:
-        fbDatabase.onNewChildAdded('notifications', 1, (snapshot, prevChildKey) => {
-          if (init) {
-            let items = snapshot.val();
-            console.log(items);
-            let noti = new Notification(null, 'basic', 'img/notification.png', items.title, items.message);
-            noti.show();
-            setTimeout(() => {
-              noti.close();
-            }, 2000);
-          }
-          init = true;
-        });
-        break;
-    }
-  } else if (realtimeDatabase.getNewItemBy === Consts.GET_NEW_ITEM_BY_ORDER_BY) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.configUpdated === true) {
+    p.stopListener();
+    p.runListener(true);
+    sendResponse({ ok: true });
   }
-}
-
-listenFirebase();
+});

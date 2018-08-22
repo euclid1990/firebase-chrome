@@ -41,11 +41,17 @@ readFromStorage().then((result) => {
     methods: {
       changeSetting: function() {
         storage.set('settings', this.settings).then((result) => {
-          this.message = '';
+          chrome.runtime.sendMessage({ configUpdated: true }, (response) => {
+            this.message = '';
+          });
         });
       },
       openOptions: function() {
-        chrome.tabs.create({'url': 'options.html'});
+        if (chrome.runtime.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        } else {
+          window.open(chrome.runtime.getURL('options.html'));
+        }
       }
     },
     created: function() {
