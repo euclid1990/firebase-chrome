@@ -8,6 +8,25 @@ Listen to new data in Firebase and show chrome notifications
 $ yarn install
 ```
 
+## Environment Variables
+
+If you do not have an `.env` file, you may have an `.env.example` file. This can just be copied using the following command
+
+```terminal
+$ cp .env.example .env
+```
+
+Setting the following configuration in `.env`:
+
+```
+API_KEY=
+AUTH_DOMAIN=
+DATABASE_URL=
+PROJECT_ID=
+STORAGE_BUCKET=
+MESSAGING_SENDER_ID=
+```
+
 ## Build
 
 ```terminal
