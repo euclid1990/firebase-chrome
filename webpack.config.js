@@ -32,7 +32,7 @@ function generateSecretConfig() {
     _.forEach(configs, function(v, k) {
       content[_.camelCase(k)] = v;
     });
-    content = JSON.stringify(content);
+    content = JSON.stringify(content, undefined, 2);
     content = `export default ${content};`;
     fs.writeFileSync(configsPath, content);
   }
