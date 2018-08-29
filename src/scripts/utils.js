@@ -88,12 +88,13 @@ export class Storage {
 }
 
 export class Notification {
-  constructor(id, type, iconUrl, title, message) {
+  constructor(id, type, iconUrl, title, message, buttons) {
     this.id = id;
     this.type = type;
     this.iconUrl = iconUrl;
     this.title = title;
     this.message = message;
+    this.buttons = buttons;
   }
 
   show() {
@@ -101,7 +102,8 @@ export class Notification {
       type: this.type,
       iconUrl: this.iconUrl,
       title: this.title,
-      message: this.message
+      message: this.message,
+      buttons: this.buttons
     };
     if (_.isNull(this.id)) {
       this.id = uuid();

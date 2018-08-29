@@ -63,7 +63,10 @@ export class Process {
   }
 
   triggerNotify(item) {
-    let noti = new Notification(null, 'basic', 'img/notification.png', item.title, item.message);
+    let buttons = [{
+      title: '新規メールなので問題ないです'
+    }];
+    let noti = new Notification(null, 'basic', 'img/notification.png', item.title, item.message, buttons);
     noti.show();
     this.autoCloseNotification(this.settings.autoClose, noti);
   }
