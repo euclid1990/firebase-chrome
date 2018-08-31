@@ -50,7 +50,8 @@ module.exports = () => {
     entry: {
       popup: path.join(__dirname, `${srcPath}/scripts/popup.js`),
       options: path.join(__dirname, `${srcPath}/scripts/options.js`),
-      background: path.join(__dirname, `${srcPath}/scripts/background.js`)
+      background: path.join(__dirname, `${srcPath}/scripts/background.js`),
+      content_scripts: path.join(__dirname, `${srcPath}/scripts/content_scripts.js`),
     },
     output: {
       filename: devMode ? 'js/[name].js' : 'js/[name].[hash].js',

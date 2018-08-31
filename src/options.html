@@ -22,8 +22,9 @@
       <div class="z-depth-1 grey lighten-4 row">
         <div>
           <ul class="tabs">
-            <li v-on:click="errors = []" class="tab col s6"><a href="#firebase"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Firebase</a></li>
-            <li v-on:click="errors = []" class="tab col s6"><a href="#realtime-database"><span class="material-fa-icons"><i class="fas fa-hdd"></i></span> Realtime Database</a></li>
+            <li v-on:click="errors = []" class="tab col s4"><a href="#apps-script"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Apps Script</a></li>
+            <li v-on:click="errors = []" class="tab col s4"><a href="#firebase"><span class="material-fa-icons"><i class="fas fa-fire"></i></span> Firebase</a></li>
+            <li v-on:click="errors = []" class="tab col s4"><a href="#realtime-database"><span class="material-fa-icons"><i class="fas fa-hdd"></i></span> Realtime Database</a></li>
           </ul>
         </div>
         <div class="col s12 margin-top-10 form-errors">
@@ -33,6 +34,24 @@
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
+        </div>
+        <div id="apps-script">
+          <form action="#" @submit="appsScriptForm" class="col s12">
+            <div class="row margin-top-10">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">insert_link</i>
+                <input id="apps_script_url" v-model="appsScript.url" placeholder="URL" type="text" class="validate">
+                <label for="apps_script_url">URL</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <center>
+                  <button type='submit' name='save_firebase' v-bind:class="{ disabled: isSaving }" class='btn btn-large waves-effect indigo'><i v-show="isSaving" class="fas fa-cog fa-spin left"></i>Save</button>
+                </center>
+              </div>
+            </div>
+          </form>
         </div>
         <div id="firebase">
           <form action="#" @submit="firebaseForm" class="col s12">
