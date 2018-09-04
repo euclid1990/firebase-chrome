@@ -2,8 +2,8 @@
   "name": "Firebase Chrome",
   "version": "1.0",
   "description": "Listen to new data in Firebase and show chrome notifications",
-  "permissions": ["notifications", "activeTab", "storage"],
-  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com 'unsafe-eval'; object-src 'self'",
+  "permissions": ["notifications", "activeTab", "storage", "https://script.google.com/"],
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://script.google.com 'unsafe-eval'; object-src 'self'",
   "background": {
     "page": "background.html",
     "persistent": true
@@ -26,5 +26,16 @@
     "64": "img/icon_64.png",
     "128": "img/icon_128.png"
   },
-  "manifest_version": 2
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "js": [
+        "js/vendors.js",
+        "js/content_scripts.js"
+      ]
+    }
+  ]
 }

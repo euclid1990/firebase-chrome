@@ -63,12 +63,29 @@ export class Process {
   }
 
   triggerNotify(item) {
-    let buttons = [{
-      title: '新規メールなので問題ないです'
-    }];
+    console.log(item);
+    let buttons = [];
+    if (item.ok === false && item.isNew === true) {
+      // Add button close for new mail & non-exist
+      buttons.push({
+        title: '新規メールなので問題ないです'
+      });
+    }
+
     let noti = new Notification(null, 'basic', 'img/notification.png', item.title, item.message, buttons);
     noti.show();
-    this.autoCloseNotification(this.settings.autoClose, noti);
+
+    if (item.ok === true) {
+      // Auto-close if mail existed
+      this.autoCloseNotification(this.settings.autoClose, noti);
+    } else if (item.isNew === true) {
+      // Add listener for button close
+      noti.addListener((notificationId, buttonIndex) => {
+        if (buttonIndex === 0) {
+          noti.close();
+        }
+      });
+    }
   }
 
   autoCloseNotification(ok, notiObj) {

@@ -114,6 +114,10 @@ export class Notification {
   close() {
     chrome.notifications.clear(this.id, () => {});
   }
+
+  addListener(callback) {
+    chrome.notifications.onButtonClicked.addListener(callback);
+  }
 }
 
 export class Firebase {

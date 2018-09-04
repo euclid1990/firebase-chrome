@@ -15,6 +15,9 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
     isFetching: false,
     isTesting: false,
     isSaving: false,
+    appsScript: {
+      url: ''
+    },
     firebase: {
       apiKey: '',
       authDomain: '',
@@ -36,8 +39,10 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
     init: async function() {
       let firebase = await storage.get('firebase');
       let realtimeDatabase = await storage.get('realtimeDatabase');
+      let appsScript = await storage.get('appsScript');
       this.firebase = _.assign(this.firebase, firebase);
       this.realtimeDatabase = _.assign(this.realtimeDatabase, realtimeDatabase);
+      this.appsScript = _.assign(this.appsScript, appsScript);
     },
     firebaseForm: function(e) {
       e.preventDefault();
@@ -147,6 +152,31 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
         await storage.set('realtimeDatabase.collections', this.realtimeDatabase.collections);
       }
       this.isFetching = false;
+    },
+    appsScriptValidate: function() {
+      this.errors = [];
+
+      if (this.appsScript.url.length === 0) {
+        this.errors.push('Apps Script URL is required.');
+      }
+
+      if (this.errors.length) {
+        return false;
+      }
+
+      return true;
+    },
+    appsScriptForm: async function(e) {
+      e.preventDefault();
+      if (!this.appsScriptValidate()) {
+        return;
+      }
+
+      storage.set('appsScript.url', this.appsScript.url).then((result) => {
+        chrome.runtime.sendMessage({ configUpdated: true }, (response) => {
+          M.toast({html: 'Saved successfully', classes: 'rounded'});
+        });
+      });
     },
     testPush: async function() {
       this.isTesting = true;
