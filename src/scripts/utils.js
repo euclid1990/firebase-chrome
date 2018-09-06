@@ -5,6 +5,10 @@ import _ from 'lodash';
 import Consts from './consts';
 
 export class Storage {
+  constructor(driver = 'sync') {
+    this.driver = chrome.storage[driver];
+  }
+
   extractMasterKey(key) {
     return key.split('.')[0];
   }
@@ -12,7 +16,7 @@ export class Storage {
   get(key, defaultValue = undefined) {
     let masterKey = this.extractMasterKey(key);
     return new Promise((resolve, reject) => {
-      chrome.storage.sync.get(masterKey, (result) => {
+      this.driver.get(masterKey, (result) => {
         let v = _.get(result, key, undefined);
         if (v === undefined) {
           console.log(`[GET] Cannot get property '${key}' of storage.`);
@@ -32,7 +36,7 @@ export class Storage {
         let o = {}; o[masterKey] = result;
         console.log(o);
         let n = _.set(o, key, value);
-        chrome.storage.sync.set(n, () => {
+        this.driver.set(n, () => {
           console.log(`[SET] storage.${key} = ${JSON.stringify(value)}.`);
           resolve(true);
         });
@@ -48,7 +52,7 @@ export class Storage {
         let c = {}; c[masterKey] = result;
         let i = _.set({}, key, value);
         let n = _.merge(i, c);
-        chrome.storage.sync.set(n, () => {
+        this.driver.set(n, () => {
           console.log(`[SET WITHOUT OVERWRITING] storage.${key} = ${JSON.stringify(value)}.`);
           resolve(true);
         });
@@ -61,14 +65,14 @@ export class Storage {
     let masterKey = keys[0];
     return new Promise((resolve, reject) => {
       if (keys.length === 1) {
-        chrome.storage.sync.remove(key, () => {
+        this.driver.remove(key, () => {
           resolve(true);
         });
       } else {
         this.get(masterKey, {}).then((result) => {
           let o = {}; o[masterKey] = result;
           let n = _.omit(o, key);
-          chrome.storage.sync.set(n, () => {
+          this.driver.set(n, () => {
             console.log(`[REMOVE] storage.${masterKey} = ${JSON.stringify(n[masterKey])}.`);
             resolve(true);
           });
@@ -79,7 +83,7 @@ export class Storage {
 
   clear() {
     return new Promise((resolve, reject) => {
-      chrome.storage.sync.clear(() => {
+      this.driver.clear(() => {
         console.log('[CLEAR] storage.');
         resolve(true);
       });

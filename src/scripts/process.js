@@ -4,6 +4,7 @@ import { Storage, Notification, FirebaseDatabase } from './utils';
 export class Process {
   constructor() {
     this.storage = new Storage();
+    this.localStorage = new Storage('local');
     this.refListener = null;
   }
 
@@ -62,7 +63,7 @@ export class Process {
     }
   }
 
-  triggerNotify(item) {
+  async triggerNotify(item) {
     console.log(item);
     let buttons = [];
     if (item.ok === false && item.isNew === true) {
@@ -72,7 +73,9 @@ export class Process {
       });
     }
 
-    let noti = new Notification(null, 'basic', 'img/notification.png', item.title, item.message, buttons);
+    let notiType = item.ok === true ? 'success' : 'warning';
+    let icon = ((await this.localStorage.get('appsScript.icon_' + notiType)) || 'img/notification.png');
+    let noti = new Notification(null, 'basic', icon, item.title, item.message, buttons);
     noti.show();
 
     if (item.ok === true) {
