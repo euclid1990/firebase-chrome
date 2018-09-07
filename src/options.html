@@ -43,6 +43,36 @@
                 <input id="apps_script_url" v-model="appsScript.url" placeholder="URL" type="text" class="validate">
                 <label for="apps_script_url">URL</label>
               </div>
+              <div class="input-field col s5">
+                <div class="file-field input-field">
+                  <i class="material-icons prefix">notifications_active</i>
+                  <div class="btn file-field-icon">
+                    <input type="file" v-on:change="loadIconNoti($event)"
+                      accept="image/x-png,image/gif,image/jpeg">
+                  </div>
+                  <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Icon success">
+                  </div>
+                </div>
+              </div>
+              <div class="input-field col s1">
+                <img :src="appsScript.icon_success" class="icon-preview"/>
+              </div>
+              <div class="input-field col s5">
+                <div class="file-field input-field">
+                  <i class="material-icons prefix">warning</i>
+                  <div class="btn file-field-icon">
+                    <input type="file" v-on:change="loadIconWarning($event)"
+                      accept="image/x-png,image/gif,image/jpeg">
+                  </div>
+                  <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Icon warning">
+                  </div>
+                </div>
+              </div>
+              <div class="input-field col s1">
+                <img :src="appsScript.icon_warning" class="icon-preview" />
+              </div>
             </div>
             <div class="row">
               <div class="input-field col s12">

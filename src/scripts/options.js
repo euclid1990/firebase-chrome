@@ -6,7 +6,7 @@ import { Storage, FirebaseDatabase } from './utils';
 import 'materialize-css/dist/js/materialize.js';
 import '../stylesheets/options.scss';
 
-const storage = new Storage();
+const storage = new Storage('local');
 
 const app = new Vue({ // eslint-disable-line no-unused-vars
   el: '#app',
@@ -16,7 +16,9 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
     isTesting: false,
     isSaving: false,
     appsScript: {
-      url: ''
+      url: '',
+      icon_success: 'img/notification.png',
+      icon_warning: 'img/notification.png'
     },
     firebase: {
       apiKey: '',
@@ -43,6 +45,24 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
       this.firebase = _.assign(this.firebase, firebase);
       this.realtimeDatabase = _.assign(this.realtimeDatabase, realtimeDatabase);
       this.appsScript = _.assign(this.appsScript, appsScript);
+    },
+    loadIconNoti: async function(event) {
+      let file = event.target.files[0];
+      var reader = new window.FileReader();
+      reader.onload = event => {
+        let dataUrl = event.target.result;
+        this.appsScript.icon_success = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    },
+    loadIconWarning: async function(event) {
+      let file = event.target.files[0];
+      var reader = new window.FileReader();
+      reader.onload = event => {
+        let dataUrl = event.target.result;
+        this.appsScript.icon_warning = dataUrl;
+      };
+      reader.readAsDataURL(file);
     },
     firebaseForm: function(e) {
       e.preventDefault();
@@ -172,7 +192,7 @@ const app = new Vue({ // eslint-disable-line no-unused-vars
         return;
       }
 
-      storage.set('appsScript.url', this.appsScript.url).then((result) => {
+      storage.set('appsScript', this.appsScript).then((result) => {
         chrome.runtime.sendMessage({ configUpdated: true }, (response) => {
           M.toast({html: 'Saved successfully', classes: 'rounded'});
         });

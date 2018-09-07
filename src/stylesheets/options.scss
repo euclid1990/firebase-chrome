@@ -11,3 +11,23 @@ form .row {
 .get-new-item-by-checkbox {
   display: inline-block;
 }
+
+.file-field-icon {
+  -webkit-box-shadow: none !important;
+  background-color: #fff;
+  color: #000;
+}
+
+.file-field-icon:hover {
+  background-color: #fff;
+}
+
+.icon-preview {
+  margin-top: 1rem;
+  width: 50%;
+  border: solid;
+  border-width: 1px;
+  border-radius: 2rem;
+  max-height: 5rem;
+  margin-left: 1rem;
+}
