@@ -7,16 +7,17 @@
   <div id="app">
     <nav>
       <div class="nav-wrapper">
-        <a href="#" class="brand-logo">FireChrome</a>
+        <a href="#" class="brand-logo brand-logo-align">Fire Chrome</a>
         <ul id="nav-mobile" class="right">
-          <li v-on:click="openOptions"><a id="nav-options"><i class="material-icons">settings</i></a></li>
+          <li title="Options" v-on:click="openOptions"><a id="nav-options"><i class="material-icons">settings</i></a></li>
+          <li title="Sign Out" v-on:click="openOptions"><a id="nav-options"><i class="fas fa-sign-out-alt"></i></a></li>
         </ul>
       </div>
     </nav>
     <div v-show="message" class="progress">
       <div class="indeterminate"></div>
     </div>
-    <div class="row content">
+    <div v-show="isAuthenticated" class="row content">
       <form action="#" class="col s12">
         <div class="row margin-top-10">
           <div v-show="" class="col s12 message">
@@ -47,6 +48,76 @@
                 </label>
               </div>
             </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div v-show="!isAuthenticated && showSignIn" class="row content">
+      <div class="col s12 margin-top-10 form-errors">
+        <div v-if="errors.length">
+          <strong class="red-text">Please correct the following errors</strong>
+          <ul class="margin-left-10 margin-top-0 margin-bottom-0">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+      </div>
+      <form action="#" @submit="signInForm" class="col s12">
+        <div class="row margin-top-10">
+          <div v-show="" class="col s12 message">
+            <span v-for="(char, index) in message.split('')" :key="index" class="message-letter">{{ char }}</span>
+          </div>
+          <div class="input-field col s12">
+            <i class="material-icons prefix">email</i>
+            <input id="email" v-model="signIn.email" placeholder="Enter email" type="text" class="validate">
+            <label for="apps_script_url">Email</label>
+          </div>
+          <div class="input-field col s12">
+            <i class="material-icons prefix">lock</i>
+            <input id="password" v-model="signIn.password" placeholder="Enter password" type="password" class="validate">
+            <label for="apps_script_url">Password</label>
+          </div>
+          <div class="input-field col s12">
+            <center>
+              <button type='submit' name='signin' v-bind:class="{ disabled: isSignIn }" class='btn btn-large waves-effect indigo'><i v-show="isSignIn" class="fas fa-cog fa-spin left"></i>Sign In</button>
+            </center>
+          </div>
+          <div class="right-align">
+            <strong><a v-on:click="showSignInUp()" class="indigo-text popup-transition text-darken-3">Sign Up Here</a></strong>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div v-show="!isAuthenticated && showSignUp" class="row content">
+      <div class="col s12 margin-top-10 form-errors">
+        <div v-if="errors.length">
+          <strong class="red-text">Please correct the following errors</strong>
+          <ul class="margin-left-10 margin-top-0 margin-bottom-0">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+      </div>
+      <form action="#" @submit="signInForm" class="col s12">
+        <div class="row margin-top-10">
+          <div v-show="" class="col s12 message">
+            <span v-for="(char, index) in message.split('')" :key="index" class="message-letter">{{ char }}</span>
+          </div>
+          <div class="input-field col s12">
+            <i class="material-icons prefix">email</i>
+            <input id="email" v-model="signIn.email" placeholder="Enter email" type="text" class="validate">
+            <label for="apps_script_url">Email</label>
+          </div>
+          <div class="input-field col s12">
+            <i class="material-icons prefix">lock</i>
+            <input id="password" v-model="signIn.password" placeholder="Enter password" type="password" class="validate">
+            <label for="apps_script_url">Password</label>
+          </div>
+          <div class="input-field col s12">
+            <center>
+              <button type='submit' name='signin' v-bind:class="{ disabled: isSignIn }" class='btn btn-large waves-effect indigo'><i v-show="isSignIn" class="fas fa-cog fa-spin left"></i>Sign Up</button>
+            </center>
+          </div>
+          <div class="right-align">
+            <strong><a v-on:click="showSignInUp()" class="indigo-text popup-transition text-darken-3">Back Sign In</a></strong>
           </div>
         </div>
       </form>

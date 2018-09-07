@@ -112,6 +112,10 @@ body {
   @include margin-bottom(10px);
 }
 
+.margin-right-10 {
+  @include margin-right(10px);
+}
+
 .form-errors {
   ul {
     margin-left: 30px;

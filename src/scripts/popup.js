@@ -21,10 +21,24 @@ readFromStorage().then((result) => {
     el: '#app',
     data: {
       message: '',
+      errors: [],
       settings: {
         enableNotification: result.enableNotification,
         autoClose: result.autoClose
       },
+      signIn: {
+        email: '',
+        password: ''
+      },
+      isSignIn: false,
+      showSignIn: true,
+      signUp: {
+        email: '',
+        password: ''
+      },
+      isSignUp: false,
+      showSignUp: false,
+      isAuthenticated: false,
       consts: Consts
     },
     watch: {
@@ -52,6 +66,64 @@ readFromStorage().then((result) => {
         } else {
           window.open(chrome.runtime.getURL('options.html'));
         }
+      },
+      signInForm: function(e) {
+        e.preventDefault();
+        if (this.isSignIn) return;
+
+        this.isSignIn = true;
+        if (!this.signInUpValidate()) {
+          this.isSignIn = false;
+          return;
+        }
+
+        storage.set('signIn', this.signIn).then((result) => {
+          this.isSignIn = false;
+          this.isAuthenticated = true;
+        });
+      },
+      signUpForm: function(e) {
+        e.preventDefault();
+        if (this.isSignUp) return;
+
+        this.isSignUp = true;
+        if (!this.signInUpValidate()) {
+          this.isSignUp = false;
+          return;
+        }
+
+        storage.set('signUp', this.signUp).then((result) => {
+          this.isSignUp = false;
+          this.isAuthenticated = true;
+        });
+      },
+      signInUpValidate: function() {
+        this.errors = [];
+
+        _.each(this.signIn, (v, k) => {
+          if (v === '') {
+            let msg = '';
+            switch (k) {
+              case 'email':
+                msg = 'Email is required.';
+                break;
+              case 'password':
+                msg = 'Password is required.';
+                break;
+            }
+            msg && this.errors.push(msg);
+          }
+        });
+
+        if (this.errors.length) {
+          return false;
+        }
+
+        return true;
+      },
+      showSignInUp: function() {
+        this.showSignIn = !this.showSignIn;
+        this.showSignUp = !this.showSignUp;
       }
     },
     created: function() {

@@ -64,3 +64,21 @@ form .row {
     }
   }
 }
+
+.brand-logo-align {
+  margin-left: 10px;
+  left: 0 !important;
+  transform: none !important;
+}
+
+nav {
+  .fas {
+    line-height: 56px;
+    display: block;
+  }
+}
+
+.popup-transition {
+  margin-right: 10px;
+  cursor: pointer;
+}
