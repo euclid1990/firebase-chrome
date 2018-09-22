@@ -8,10 +8,8 @@ var p = new Process();
 chrome.runtime.onInstalled.addListener(async () => {
   let storage = new Storage();
   let firebaseConfigs = Firebase.pickConfigs(configs);
-  let realtimeDatabaseConfigs = Firebase.pickRealtimeDatabaseConfigs(configs);
   let settings = Process.pickSettingConfigs();
   await storage.setWithoutOverwriting('firebase', firebaseConfigs);
-  await storage.setWithoutOverwriting('realtimeDatabase', realtimeDatabaseConfigs);
   await storage.setWithoutOverwriting('settings', settings);
   p.runListener();
 });
@@ -21,9 +19,37 @@ chrome.runtime.onStartup.addListener(async () => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.configUpdated === true) {
-    p.stopListener();
-    p.runListener(true);
-    sendResponse({ ok: true });
+  if (request.configUpdated) {
+    p.stopListener().then(() => {
+      p.runListener(true).then(result => {
+        sendResponse(result);
+      });
+    });
   }
+
+  if (request.signUp) {
+    p.signUp().then(result => {
+      sendResponse(result);
+    });
+  }
+
+  if (request.signIn) {
+    p.signIn().then(result => {
+      sendResponse(result);
+    });
+  }
+
+  if (request.signOut) {
+    p.signOut().then(result => {
+      sendResponse(result);
+    });
+  }
+
+  if (request.onSendMail) {
+    p.pushMail(request.onSendMail).then(result => {
+      sendResponse(result);
+    });
+  }
+
+  return true;
 });

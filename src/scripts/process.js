@@ -1,11 +1,10 @@
 import Consts from './consts';
-import { Storage, Notification, FirebaseDatabase } from './utils';
+import { Storage, Notification, FirebaseDatabase, FirebaseAuth, checkSendSameEmail } from './utils';
 
 export class Process {
   constructor() {
     this.storage = new Storage();
-    this.localStorage = new Storage('local');
-    this.refListener = null;
+    this.emails = {};
   }
 
   static pickSettingConfigs() {
@@ -19,10 +18,6 @@ export class Process {
     if (typeof this.firebase === 'undefined' || force) {
       this.firebase = await this.storage.get('firebase');
     }
-    if (typeof this.realtimeDatabase === 'undefined' || force) {
-      this.realtimeDatabase = await this.storage.get('realtimeDatabase');
-      this.ref = this.realtimeDatabase.collection;
-    }
     if (typeof this.settings === 'undefined' || force) {
       this.settings = await this.storage.get('settings');
     }
@@ -33,38 +28,59 @@ export class Process {
     await this.initialize(again);
 
     let fbDatabase = new FirebaseDatabase(this.firebase);
-    let init = true;
+    let fbAuth = new FirebaseAuth(this.firebase);
 
     if (!this.settings.enableNotification) {
       return;
     }
 
-    if (this.realtimeDatabase.getNewItemBy === Consts.GET_NEW_ITEM_BY_GRAB_LIMIT) {
-      switch (this.realtimeDatabase.grabType) {
-        case Consts.GRAB_LIMIT_TO_FIRST:
-          fbDatabase.onFirstChildUpdated('notifications', 1, (snapshot) => {
-            this.triggerNotify(snapshot.val());
-          });
-          break;
-        case Consts.GRAB_LIMIT_TO_LAST:
-          fbDatabase.onNewChildAdded('notifications', 1, (snapshot, prevChildKey) => {
-            if (init) {
-              init = false;
-              return;
-            }
-            this.triggerNotify(snapshot.val());
-          });
-          break;
-      }
-    } else if (this.realtimeDatabase.getNewItemBy === Consts.GET_NEW_ITEM_BY_ORDER_BY) {
-      fbDatabase.onAfterStartAtChild('notifications', this.realtimeDatabase.orderBy, Date.now(), (snapshot, prevChildKey) => {
-        this.triggerNotify(snapshot.val());
-      });
+    if (again) {
+      // In case update config, we only need re-watching
+      let ref = await this.storage.get('ref');
+      this.newMailAdded(fbDatabase, ref);
+      return;
     }
+
+    var unsubscribe = fbAuth.onAuthStateChanged(async (user) => {
+      console.log('Firebase auth state changed !');
+      if (!user) {
+        // Try sign in from storage information
+        return this.signIn();
+      };
+      // unsubscribe(); /* Firebase onAuthStateChanged unsubscribe */
+      // Get list all emails
+
+      console.log(`User [${user.uid}] have been signed in.`);
+
+      let ref = `emails/${user.uid}`;
+      this.newMailAdded(fbDatabase, ref);
+    });
+  }
+
+  async newMailAdded(fbDatabase, ref) {
+    let init = true;
+    this.emails = await fbDatabase.read(ref);
+    this.emails = this.emails.val();
+    if (!this.emails) {
+      init = false;
+      this.emails = {};
+    }
+    // Perform watching and check email
+    fbDatabase.onNewChildAdded(ref, 1, (snapshot, prevChildKey) => {
+      // Skip check init if this email is first email
+      if (init) {
+        init = false;
+        return;
+      }
+      let key = snapshot.key;
+      let recentMail = snapshot.val();
+      let item = checkSendSameEmail(this.emails, recentMail);
+      this.emails[key] = recentMail;
+      this.triggerNotify(item);
+    });
   }
 
   async triggerNotify(item) {
-    console.log(item);
     let buttons = [];
     if (item.ok === false && item.isNew === true) {
       // Add button close for new mail & non-exist
@@ -73,10 +89,9 @@ export class Process {
       });
     }
 
-    let notiType = item.ok === true ? 'success' : 'warning';
-    let icon = ((await this.localStorage.get('appsScript.icon_' + notiType)) || 'img/notification.png');
+    let notiType = item.ok === true ? 'ok' : 'warning';
+    let icon = ((await this.storage.get('common.icon_' + notiType)) || 'img/notification.png');
     let noti = new Notification(null, 'basic', icon, item.title, item.message, buttons);
-    noti.show();
 
     if (item.ok === true) {
       // Auto-close if mail existed
@@ -89,6 +104,8 @@ export class Process {
         }
       });
     }
+
+    noti.show();
   }
 
   autoCloseNotification(ok, notiObj) {
@@ -99,8 +116,79 @@ export class Process {
     }
   }
 
-  stopListener() {
+  async stopListener() {
     let fbDatabase = new FirebaseDatabase(this.firebase);
-    fbDatabase.database.ref(this.realtimeDatabase.collection).off();
+    let ref = await this.storage.get('ref');
+    await fbDatabase.database.ref(ref).off();
+    await this.storage.remove('ref');
+  }
+
+  async pushMail(dataTimestamp) {
+    let isAuthenticated = await this.storage.get('isAuthenticated');
+    if (!isAuthenticated) return;
+
+    await this.initialize();
+
+    let fbDatabase = new FirebaseDatabase(this.firebase);
+    let ref = await this.storage.get('ref');
+    let payload = await this.storage.get(dataTimestamp);
+    try {
+      await fbDatabase.push(ref, payload);
+      await this.storage.remove(dataTimestamp);
+      return { success: true, message: '' };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+
+  async signIn() {
+    await this.initialize();
+    let fbAuth = new FirebaseAuth(this.firebase);
+    let signInInfo = await this.storage.get('signIn');
+    if (!this.signIn) return { success: false, message: 'Sign in info not found.' };
+
+    try {
+      let result = await fbAuth.signIn(signInInfo);
+      let uid = result.user.uid;
+      await this.storage.set('isAuthenticated', true);
+      await this.storage.set('ref', `emails/${uid}`);
+      return { success: true, message: '' };
+    } catch (error) {
+      await this.storage.set('isAuthenticated', false);
+      return { success: false, message: error.message };
+    }
+  }
+
+  async signUp() {
+    await this.initialize();
+    let fbAuth = new FirebaseAuth(this.firebase);
+    let signUpInfo = await this.storage.get('signUp');
+    if (!this.signUp) return { success: false, message: 'Sign up info not found.' };
+
+    try {
+      let result = await fbAuth.signUp(signUpInfo);
+      let uid = result.user.uid;
+      await this.storage.set('isAuthenticated', true);
+      await this.storage.set('ref', `emails/${uid}`);
+      return { success: true, message: '' };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+
+  async signOut() {
+    await this.initialize();
+    let fbAuth = new FirebaseAuth(this.firebase);
+
+    try {
+      await this.storage.remove('signIn');
+      await this.storage.remove('signUp');
+      await this.storage.set('isAuthenticated', false);
+      await this.stopListener();
+      await fbAuth.signOut();
+      return { success: true, message: '' };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
   }
 }

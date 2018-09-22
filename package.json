@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "firebase": "^5.4.0",
+    "moment": "^2.22.2",
     "mutation-observer": "^1.0.3"
   }
 }

@@ -10,10 +10,11 @@ const storage = new Storage();
 
 async function readFromStorage() {
   let settings = await storage.get('settings');
-  return _.assign({
-    enableNotification: true,
-    autoClose: false
-  }, settings);
+  let isAuthenticated = await storage.get('isAuthenticated', false);
+  return {
+    settings: _.assign({ enableNotification: true, autoClose: false }, settings),
+    isAuthenticated: isAuthenticated
+  };
 }
 
 readFromStorage().then((result) => {
@@ -30,15 +31,14 @@ readFromStorage().then((result) => {
         email: '',
         password: ''
       },
-      isSignIn: false,
-      showSignIn: true,
       signUp: {
         email: '',
         password: ''
       },
-      isSignUp: false,
+      isSigning: false,
+      isAuthenticated: result.isAuthenticated,
       showSignUp: false,
-      isAuthenticated: false,
+      showSignIn: true,
       consts: Consts
     },
     watch: {
@@ -69,38 +69,49 @@ readFromStorage().then((result) => {
       },
       signInForm: function(e) {
         e.preventDefault();
-        if (this.isSignIn) return;
+        if (this.isSigning) return;
 
-        this.isSignIn = true;
-        if (!this.signInUpValidate()) {
-          this.isSignIn = false;
+        this.isSigning = true;
+        this.message = '';
+        if (!this.signInUpValidate(this.signIn)) {
+          this.isSigning = false;
           return;
         }
 
         storage.set('signIn', this.signIn).then((result) => {
-          this.isSignIn = false;
-          this.isAuthenticated = true;
+          chrome.runtime.sendMessage({ signIn: true }, (response) => {
+            console.log(response);
+            this.isAuthenticated = response.success;
+            this.message = response.message;
+            this.isSigning = false;
+          });
         });
       },
       signUpForm: function(e) {
         e.preventDefault();
-        if (this.isSignUp) return;
+        if (this.isSigning) return;
 
-        this.isSignUp = true;
-        if (!this.signInUpValidate()) {
-          this.isSignUp = false;
+        this.isSigning = true;
+        this.message = '';
+        if (!this.signInUpValidate(this.signUp)) {
+          this.isSigning = false;
           return;
         }
 
         storage.set('signUp', this.signUp).then((result) => {
-          this.isSignUp = false;
-          this.isAuthenticated = true;
+          storage.set('signIn', { email: this.signUp.email, password: this.signUp.password }).then((result) => {
+            chrome.runtime.sendMessage({ signUp: true }, (response) => {
+              this.isAuthenticated = response.success;
+              this.message = response.message;
+              this.isSigning = false;
+            });
+          });
         });
       },
-      signInUpValidate: function() {
+      signInUpValidate: function(data) {
         this.errors = [];
 
-        _.each(this.signIn, (v, k) => {
+        _.each(data, (v, k) => {
           if (v === '') {
             let msg = '';
             switch (k) {
@@ -120,6 +131,17 @@ readFromStorage().then((result) => {
         }
 
         return true;
+      },
+      signOut: function() {
+        if (this.isSigning) return;
+
+        this.isSigning = true;
+
+        chrome.runtime.sendMessage({ signOut: true }, (response) => {
+          this.isAuthenticated = !response.success;
+          this.message = response.message;
+          this.isSigning = false;
+        });
       },
       showSignInUp: function() {
         this.showSignIn = !this.showSignIn;

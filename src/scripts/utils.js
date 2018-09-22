@@ -1,12 +1,14 @@
 import firebase from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/database';
 import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
 import Consts from './consts';
 
 export class Storage {
-  constructor(driver = 'sync') {
+  constructor(driver = 'local', debug = false) {
     this.driver = chrome.storage[driver];
+    this.debug = debug;
   }
 
   extractMasterKey(key) {
@@ -19,25 +21,25 @@ export class Storage {
       this.driver.get(masterKey, (result) => {
         let v = _.get(result, key, undefined);
         if (v === undefined) {
-          console.log(`[GET] Cannot get property '${key}' of storage.`);
+          this.debug && console.log(`[GET] Cannot get property '${key}' of storage.`);
           return resolve(defaultValue);
         }
-        console.log(`[GET] storage.${key} = ${JSON.stringify(v)}.`);
+        this.debug && console.log(`[GET] storage.${key} = ${JSON.stringify(v)}.`);
         return resolve(v);
       });
     });
   }
 
   set(key, value) {
-    console.log(key);
+    this.debug && console.log(key);
     let masterKey = this.extractMasterKey(key);
     return new Promise((resolve, reject) => {
       this.get(masterKey, {}).then((result) => {
         let o = {}; o[masterKey] = result;
-        console.log(o);
+        this.debug && console.log(o);
         let n = _.set(o, key, value);
         this.driver.set(n, () => {
-          console.log(`[SET] storage.${key} = ${JSON.stringify(value)}.`);
+          this.debug && console.log(`[SET] storage.${key} = ${JSON.stringify(value)}.`);
           resolve(true);
         });
       });
@@ -45,7 +47,7 @@ export class Storage {
   }
 
   setWithoutOverwriting(key, value) {
-    console.log(key);
+    this.debug && console.log(key);
     let masterKey = this.extractMasterKey(key);
     return new Promise((resolve, reject) => {
       this.get(masterKey, {}).then((result) => {
@@ -53,7 +55,7 @@ export class Storage {
         let i = _.set({}, key, value);
         let n = _.merge(i, c);
         this.driver.set(n, () => {
-          console.log(`[SET WITHOUT OVERWRITING] storage.${key} = ${JSON.stringify(value)}.`);
+          this.debug && console.log(`[SET WITHOUT OVERWRITING] storage.${key} = ${JSON.stringify(value)}.`);
           resolve(true);
         });
       });
@@ -73,7 +75,7 @@ export class Storage {
           let o = {}; o[masterKey] = result;
           let n = _.omit(o, key);
           this.driver.set(n, () => {
-            console.log(`[REMOVE] storage.${masterKey} = ${JSON.stringify(n[masterKey])}.`);
+            this.debug && console.log(`[REMOVE] storage.${masterKey} = ${JSON.stringify(n[masterKey])}.`);
             resolve(true);
           });
         });
@@ -84,7 +86,7 @@ export class Storage {
   clear() {
     return new Promise((resolve, reject) => {
       this.driver.clear(() => {
-        console.log('[CLEAR] storage.');
+        this.debug && console.log('[CLEAR] storage.');
         resolve(true);
       });
     });
@@ -129,6 +131,7 @@ export class Firebase {
     this.configs = configs;
     if (!firebase.apps.length) {
       firebase.initializeApp(this.configs);
+      firebase.database.enableLogging(false);
     }
     this.app = firebase.app();
   }
@@ -157,6 +160,10 @@ export class FirebaseDatabase extends Firebase {
   constructor(configs) {
     super(configs);
     this.database = this.app.database();
+  }
+
+  ref(ref) {
+    return this.database.ref(ref);
   }
 
   /**
@@ -200,7 +207,7 @@ export class FirebaseDatabase extends Firebase {
   /**
    * To read data at a path and listen for changes
    */
-  on(ref, eventType, cb) {
+  _on(ref, eventType, cb) {
     return this.database.ref(ref).on(eventType, (snapshot) => {
       cb && cb(snapshot);
     });
@@ -269,4 +276,53 @@ export class FirebaseDatabase extends Firebase {
       cb && cb(snapshot, prevChildKey);
     });
   }
+}
+
+export class FirebaseAuth extends Firebase {
+  constructor(configs) {
+    super(configs);
+    this.auth = this.app.auth();
+  }
+
+  signIn(data) {
+    return this.auth.signInWithEmailAndPassword(data.email, data.password);
+  }
+
+  signUp(data) {
+    return this.auth.createUserWithEmailAndPassword(data.email, data.password);
+  }
+
+  signOut(successCb) {
+    return this.auth.signOut();
+  }
+
+  onAuthStateChanged(cb) {
+    return this.auth.onAuthStateChanged((user) => {
+      cb && cb(user);
+    });
+  }
+}
+
+export function checkSendSameEmail(emails, recentMail) {
+  let firstStr = recentMail.to + recentMail.cc + recentMail.bcc + recentMail.title + recentMail.body;
+  for (let i in emails) {
+    let compareStr = emails[i].to + emails[i].cc + emails[i].bcc + emails[i].title + emails[i].body;
+    if (firstStr === compareStr) {
+      let result = {
+        'title': 'OK !',
+        'message': 'Sending Mail Complete !',
+        'isNew': recentMail.isNew,
+        'ok': true
+      };
+      return result;
+    }
+  }
+
+  let result = {
+    'title': 'Warning !',
+    'message': 'Please Checking sent mail !',
+    'isNew': recentMail.isNew,
+    'ok': false
+  };
+  return result;
 }

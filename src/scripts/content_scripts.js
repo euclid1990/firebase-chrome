@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import moment from 'moment';
 import { Storage } from './utils';
 var MutationObserver = require('mutation-observer');
 
@@ -14,20 +15,16 @@ export class ContentScript {
     return '';
   }
 
+  // Get now datetime at UTC timezone
+  nowUtc() {
+    return moment().utc().format('YYYY-MM-DD HH:mm:ss'); // Convert to UTC
+  }
+
   async onSendMail(data) {
-    let url = await this.storage.get('appsScript.url');
-    $.post({
-      data: JSON.stringify(data),
-      url: url,
-      contentType: 'application/json',
-      success: function(response, status, xhr) {
-        if (status === 'success') {
-          console.log('Success');
-        }
-      },
-      error: function(xhr, status, errors) {
-        console.log(xhr, status, errors);
-      }
+    var timestamp = new Date().getTime();
+    await this.storage.set(`${timestamp}`, data);
+    chrome.runtime.sendMessage({ onSendMail: `${timestamp}` }, (response) => {
+
     });
   }
 
@@ -74,6 +71,9 @@ export class ContentScript {
                 }, 4000);
               } else {
                 mailContent['isNew'] = false;
+                mailContent['orderBy'] = Date.now();
+                mailContent['createdAt'] = this.nowUtc();
+                mailContent['deletedAt'] = '';
                 this.onSendMail(mailContent);
                 mailContent = {};
               }
