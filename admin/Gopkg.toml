@@ -28,3 +28,8 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[metadata.heroku]
+  root-package = "github.com/euclid1990/firebase-chrome"
+  go-version = "1.11"
+  install = [ "." ]
