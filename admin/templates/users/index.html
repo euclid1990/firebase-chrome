@@ -1,0 +1,56 @@
+{{define "content"}}
+<div id="user-index">
+  <user-index></user-index>
+</div>
+{{end}}
+
+{{define "script"}}
+<template id="user-index-component">
+  <v-card class="elevation-12">
+    <v-toolbar dark color="primary">
+      <v-toolbar-title>User List</v-toolbar-title>
+    </v-toolbar>
+    <v-card-text>
+      <v-data-table
+        :headers="headers"
+        :items="users"
+        hide-actions
+        class="elevation-1"
+      >
+        <template slot="items" slot-scope="props">
+          <td>${ ++props.index }</td>
+          <td class="text-xs-right">${ props.item.identifier }</td>
+          <td class="text-xs-right">${ props.item.uid }</td>
+          <td class="text-xs-right">${ props.item.created_at }</td>
+          <td class="text-xs-right">${ props.item.signed_in }</td>
+          <td class="text-xs-right">${ props.item.is_paid ? 'Yes' : 'No' }</td>
+        </template>
+      </v-data-table>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script type="text/javascript">
+  Vue.component('user-index', {
+    delimiters: ['${', '}'],
+    template: '#user-index-component',
+    data () {
+      return {
+        headers: [
+          {
+            text: '#',
+            align: 'left',
+            sortable: false
+          },
+          { text: 'Identifier', value: 'identifier' },
+          { text: 'User UID', value: 'uid' },
+          { text: 'Created', value: 'created_at' },
+          { text: 'Signed In', value: 'signed_in' },
+          { text: 'Paid', value: 'is_paid' }
+        ],
+        users: {{ .users }}
+      }
+    }
+  })
+</script>
+{{end}}

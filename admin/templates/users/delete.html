@@ -1,0 +1,80 @@
+{{define "content"}}
+<div id="user-delete">
+  <user-delete></user-delete>
+</div>
+{{end}}
+
+{{define "script"}}
+<template id="user-delete-component">
+  <v-card class="elevation-12">
+    <v-toolbar dark color="primary">
+      <v-toolbar-title>Remove Paid User</v-toolbar-title>
+    </v-toolbar>
+    <v-progress-linear
+      v-show=isSubmitting
+      color="success"
+      height="5"
+      class="ma-0"
+      :indeterminate="true"
+    ></v-progress-linear>
+    <v-card-text>
+      <v-alert
+        :value=message
+        :type=alert
+      >
+        ${ message }
+      </v-alert>
+      <div v-show="message" class="mb-3"></div>
+      <v-form @submit="submit" action="#">
+        <v-text-field prepend-icon="email" name="email" label="Input Email" type="text" v-model="email"></v-text-field>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" type="submit">Remove</v-btn>
+        </v-card-actions>
+      </v-form>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script type="text/javascript">
+  Vue.component('user-delete', {
+    delimiters: ['${', '}'],
+    template: '#user-delete-component',
+    data () {
+      return {
+        message: '',
+        email: '',
+        alert: 'success',
+        isSubmitting: false
+      }
+    },
+    methods: {
+      submit (e) {
+        e.preventDefault();
+        this.message = '';
+        if (!this.email || this.isSubmitting) {
+          return;
+        }
+        this.isSubmitting = true;
+        axios.post('/users/delete', {
+          email: this.email
+        })
+        .then((response) => {
+          this.message = response.data.message;
+          if (response.data.success) {
+            return this.alert = 'success';
+          };
+          this.alert = 'error';
+        })
+        .catch((error) => {
+          this.alert = 'error';
+          this.message = error.message;
+        })
+        .then(() => {
+          this.isSubmitting = false;
+        });
+      }
+    }
+  })
+</script>
+{{end}}
