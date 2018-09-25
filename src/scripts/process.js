@@ -146,7 +146,7 @@ export class Process {
     await this.initialize();
     let fbAuth = new FirebaseAuth(this.firebase);
     let signInInfo = await this.storage.get('signIn');
-    if (!this.signIn) return { success: false, message: 'Sign in info not found.' };
+    if (!signInInfo) return { success: false, message: 'Sign in info not found.' };
 
     try {
       let result = await fbAuth.signIn(signInInfo);
@@ -164,7 +164,7 @@ export class Process {
     await this.initialize();
     let fbAuth = new FirebaseAuth(this.firebase);
     let signUpInfo = await this.storage.get('signUp');
-    if (!this.signUp) return { success: false, message: 'Sign up info not found.' };
+    if (!signUpInfo) return { success: false, message: 'Sign up info not found.' };
 
     try {
       let result = await fbAuth.signUp(signUpInfo);
@@ -188,6 +188,21 @@ export class Process {
       await this.stopListener();
       await fbAuth.signOut();
       return { success: true, message: '' };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+
+  async resetPassword() {
+    await this.initialize();
+    let fbAuth = new FirebaseAuth(this.firebase);
+    let resetInfo = await this.storage.get('reset');
+    if (!resetInfo) return { success: false, message: 'Reset info not found.' };
+
+    try {
+      await fbAuth.sendPasswordResetEmail(resetInfo.email);
+      await this.storage.remove('reset');
+      return { success: true, message: 'Password reset email was sent' };
     } catch (error) {
       return { success: false, message: error.message };
     }

@@ -7,7 +7,7 @@
   <div id="app">
     <nav>
       <div class="nav-wrapper">
-        <a href="#" class="brand-logo brand-logo-align">Fire Chrome</a>
+        <a href="#" class="brand-logo brand-logo-align">AI Mail Filter</a>
         <ul id="nav-mobile" class="right" v-show="isAuthenticated">
           <li title="Options" v-on:click="openOptions"><a id="nav-options"><i class="material-icons">settings</i></a></li>
           <li title="Sign Out" v-on:click="signOut"><a id="nav-options"><i class="fas fa-sign-out-alt"></i></a></li>
@@ -80,8 +80,13 @@
               <button type='submit' name='signin' v-bind:class="{ disabled: isSigning }" class='btn btn-large waves-effect indigo'><i v-show="isSigning" class="fas fa-spinner fa-spin left"></i>Sign In</button>
             </center>
           </div>
-          <div class="right-align">
-            <strong><a v-on:click="showSignInUp()" class="indigo-text popup-transition text-darken-3">Sign Up Here</a></strong>
+          <div class="sign-in-bottom">
+            <div class="left-align">
+              <strong><a v-on:click="showSignInReset()" class="indigo-text popup-transition text-darken-3">Reset Password</a></strong>
+            </div>
+            <div class="right-align">
+              <strong><a v-on:click="showSignInUp()" class="indigo-text popup-transition text-darken-3">Sign Up Here</a></strong>
+            </div>
           </div>
         </div>
       </form>
@@ -117,6 +122,33 @@
           </div>
           <div class="right-align">
             <strong><a v-on:click="showSignInUp()" class="indigo-text popup-transition text-darken-3">Back Sign In</a></strong>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div v-show="!isAuthenticated && showReset" class="row content">
+      <div v-if="errors.length" class="col s12 margin-top-10 form-errors">
+        <div>
+          <strong class="red-text">Please correct the following errors</strong>
+          <ul class="margin-left-10 margin-top-0 margin-bottom-0">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+      </div>
+      <form action="#" @submit="resetForm" class="col s12">
+        <div class="row margin-top-10">
+          <div class="input-field col s12">
+            <i class="material-icons prefix">email</i>
+            <input id="email" v-model="reset.email" placeholder="Enter email to reset password" type="text" class="validate">
+            <label for="apps_script_url">Email</label>
+          </div>
+          <div class="input-field col s12">
+            <center>
+              <button type='submit' name='signin' v-bind:class="{ disabled: isResetting }" class='btn btn-large waves-effect indigo'><i v-show="isSigning" class="fas fa-spinner fa-spin left"></i>Reset</button>
+            </center>
+          </div>
+          <div class="right-align">
+            <strong><a v-on:click="showSignInReset()" class="indigo-text popup-transition text-darken-3">Back Sign In</a></strong>
           </div>
         </div>
       </form>

@@ -1,7 +1,7 @@
 {
-  "name": "Firebase Chrome",
+  "name": "AI Mail Filter",
   "version": "1.0",
-  "description": "Listen to new data in Firebase and show chrome notifications",
+  "description": "Avoid sending e-mail mistakes with a single setting by Artificial intelligence.",
   "permissions": ["notifications", "activeTab", "storage", "https://script.google.com/"],
   "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://script.google.com 'unsafe-eval'; object-src 'self'",
   "background": {

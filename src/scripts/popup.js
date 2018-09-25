@@ -2,7 +2,7 @@ import $ from 'jquery'; // eslint-disable-line no-unused-vars
 import Vue from 'vue';
 import _ from 'lodash';
 import Consts from './consts';
-import { Storage } from './utils';
+import { Storage, FirebaseAuth } from './utils';
 import 'materialize-css/dist/js/materialize.js';
 import '../stylesheets/popup.scss';
 
@@ -35,10 +35,15 @@ readFromStorage().then((result) => {
         email: '',
         password: ''
       },
+      reset: {
+        email: ''
+      },
       isSigning: false,
+      isResetting: false,
       isAuthenticated: result.isAuthenticated,
       showSignUp: false,
       showSignIn: true,
+      showReset: false,
       consts: Consts
     },
     watch: {
@@ -134,6 +139,46 @@ readFromStorage().then((result) => {
 
         return true;
       },
+      resetForm: async function(e) {
+        e.preventDefault();
+        if (this.isResetting) return;
+
+        this.isResetting = true;
+        this.message = '';
+        if (!this.resetValidate(this.reset)) {
+          this.isResetting = false;
+          return;
+        }
+
+        this.reset.email = this.reset.email.trim();
+        storage.set('reset', this.reset).then((result) => {
+          chrome.runtime.sendMessage({ reset: true }, (response) => {
+            this.message = response.message;
+            this.isResetting = false;
+          });
+        });
+      },
+      resetValidate: function(data) {
+        this.errors = [];
+
+        _.each(data, (v, k) => {
+          if (v === '') {
+            let msg = '';
+            switch (k) {
+              case 'email':
+                msg = 'Email is required.';
+                break;
+            }
+            msg && this.errors.push(msg);
+          }
+        });
+
+        if (this.errors.length) {
+          return false;
+        }
+
+        return true;
+      },
       signOut: function() {
         if (this.isSigning) return;
 
@@ -148,6 +193,10 @@ readFromStorage().then((result) => {
       showSignInUp: function() {
         this.showSignIn = !this.showSignIn;
         this.showSignUp = !this.showSignUp;
+      },
+      showSignInReset: function() {
+        this.showSignIn = !this.showSignIn;
+        this.showReset = !this.showReset;
       }
     },
     created: function() {

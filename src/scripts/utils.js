@@ -301,6 +301,10 @@ export class FirebaseAuth extends Firebase {
       cb && cb(user);
     });
   }
+
+  sendPasswordResetEmail(email, cb) {
+    return this.auth.sendPasswordResetEmail(email);
+  }
 }
 
 export function checkSendSameEmail(emails, recentMail) {

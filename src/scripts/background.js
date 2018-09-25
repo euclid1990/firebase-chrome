@@ -27,6 +27,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
 
+  if (request.reset) {
+    p.resetPassword().then(result => {
+      sendResponse(result);
+    });
+  }
+
   if (request.signUp) {
     p.signUp().then(result => {
       sendResponse(result);
