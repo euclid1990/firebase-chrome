@@ -1,0 +1,59 @@
+{{define "content"}}
+<div id="user-show">
+  <user-show></user-show>
+</div>
+{{end}}
+
+{{define "script"}}
+<template id="user-show-component">
+  <v-card class="elevation-12">
+    <v-toolbar dark color="primary">
+      <v-toolbar-title>User Detail</v-toolbar-title>
+    </v-toolbar>
+    <v-card-text>
+      <v-list dense style="max-width: 700px; margin: 0 auto;">
+        <v-list-tile>
+          <v-list-tile-content>UID:</v-list-tile-content>
+          <v-list-tile-content class="align-end">${ user.uid }</v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-content>Email:</v-list-tile-content>
+          <v-list-tile-content class="align-end">${ user.email }</v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-content>Paid:</v-list-tile-content>
+          <v-list-tile-content class="align-end"><v-chip v-if="user.is_paid" color="lime darken-3">Yes</v-chip><v-chip v-else>No</v-chip></v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-content>Paid At:</v-list-tile-content>
+          <v-list-tile-content class="align-end">${ user.paid_at }</v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-content>Un Paid At:</v-list-tile-content>
+          <v-list-tile-content class="align-end">${ user.un_paid_at }</v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-content>Signed In:</v-list-tile-content>
+          <v-list-tile-content class="align-end">${ user.signed_in }</v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-content>Created At:</v-list-tile-content>
+          <v-list-tile-content class="align-end">${ user.created_at }</v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script type="text/javascript">
+  Vue.component('user-show', {
+    delimiters: ['${', '}'],
+    template: '#user-show-component',
+    data () {
+      return {
+        user: {{ .user }}
+      }
+    }
+  })
+</script>
+{{end}}

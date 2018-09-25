@@ -18,6 +18,7 @@ func createMyRender() multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
 	r.AddFromFiles("index", "templates/master.html", "templates/index.html")
 	r.AddFromFiles("userIndex", "templates/master.html", "templates/users/index.html")
+	r.AddFromFiles("userShow", "templates/master.html", "templates/users/show.html")
 	r.AddFromFiles("userCreate", "templates/master.html", "templates/users/create.html")
 	r.AddFromFiles("userDelete", "templates/master.html", "templates/users/delete.html")
 	return r
@@ -46,6 +47,14 @@ func setupRouter() *gin.Engine {
 			users := UserIndex()
 			c.HTML(http.StatusOK, "userIndex", gin.H{
 				"users": users,
+			})
+		})
+
+		u.GET("/show/:uid", func(c *gin.Context) {
+			uid := c.Param("uid")
+			user := UserShow(uid)
+			c.HTML(http.StatusOK, "userShow", gin.H{
+				"user": user,
 			})
 		})
 

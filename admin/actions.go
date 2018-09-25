@@ -25,8 +25,8 @@ type User struct {
 
 // Paid user is a json-serializable type.
 type PaidUser struct {
-	Uid      string `json:"uid,omitempty"`
-	Email    string `json:"email,omitempty"`
+	Uid      string `json:"uid"`
+	Email    string `json:"email"`
 	IsPaid   bool   `json:"isPaid"`
 	PaidAt   int64  `json:"paidAt"`
 	UnPaidAt int64  `json:"unPaidAt"`
@@ -101,6 +101,47 @@ func UserIndex() []*User {
 			break
 		}
 	}
+	return data
+}
+
+func UserShow(uid string) map[string]interface{} {
+	uid = strings.TrimSpace(uid)
+
+	u, err := clientAuth.GetUser(ctx, uid)
+	if err != nil {
+		log.Fatalf("error getting user %s: %v\n", uid, err)
+	}
+	createdAt := time.Unix(u.UserMetadata.CreationTimestamp*int64(time.Microsecond)/int64(time.Millisecond), 0)
+	lastLoginAt := time.Unix(u.UserMetadata.LastLogInTimestamp*int64(time.Microsecond)/int64(time.Millisecond), 0)
+
+	data := map[string]interface{}{
+		"uid":        u.UID,
+		"email":      u.Email,
+		"providers":  u.ProviderID,
+		"is_paid":    false,
+		"paid_at":    "",
+		"un_paid_at": "",
+		"created_at": createdAt.Format(time.RFC3339),
+		"signed_in":  lastLoginAt.Format(time.RFC3339),
+	}
+
+	ref := clientDb.NewRef("paid_users" + "/" + uid)
+	var paidUser PaidUser
+	if err := ref.Get(ctx, &paidUser); err != nil {
+		log.Fatalln("Error reading from database:", err)
+		return data
+	}
+
+	if paidUser != (PaidUser{}) {
+		data["is_paid"] = paidUser.IsPaid
+		if paidUser.PaidAt != 0 {
+			data["paid_at"] = time.Unix(paidUser.PaidAt, 0).Format(time.RFC3339)
+		}
+		if paidUser.UnPaidAt != 0 {
+			data["un_paid_at"] = time.Unix(paidUser.UnPaidAt, 0).Format(time.RFC3339)
+		}
+	}
+
 	return data
 }
 

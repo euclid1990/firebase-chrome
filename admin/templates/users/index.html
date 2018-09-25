@@ -23,7 +23,8 @@
           <td class="text-xs-right">${ props.item.uid }</td>
           <td class="text-xs-right">${ props.item.created_at }</td>
           <td class="text-xs-right">${ props.item.signed_in }</td>
-          <td class="text-xs-right">${ props.item.is_paid ? 'Yes' : 'No' }</td>
+          <td class="text-xs-right"><v-chip v-if="props.item.is_paid" color="lime darken-3">Yes</v-chip><v-chip v-else>No</v-chip></td>
+          <td class="text-xs-right"><v-btn color="info" small :href="'show/' + props.item.uid">Info</v-btn></td>
         </template>
       </v-data-table>
     </v-card-text>
@@ -37,16 +38,13 @@
     data () {
       return {
         headers: [
-          {
-            text: '#',
-            align: 'left',
-            sortable: false
-          },
+          { text: '#', align: 'left', sortable: false },
           { text: 'Identifier', value: 'identifier' },
           { text: 'User UID', value: 'uid' },
           { text: 'Created', value: 'created_at' },
           { text: 'Signed In', value: 'signed_in' },
-          { text: 'Paid', value: 'is_paid' }
+          { text: 'Paid', value: 'is_paid' },
+          { text: 'Detail', align: 'right', sortable: false }
         ],
         users: {{ .users }}
       }
