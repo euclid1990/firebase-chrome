@@ -41,7 +41,7 @@ export class Process {
       return;
     }
 
-    var unsubscribe = fbAuth.onAuthStateChanged(async (user) => {
+    var unsubscribe = fbAuth.onAuthStateChanged(async (user) => { /* eslint-disable-line no-unused-vars */
       console.log('Firebase auth state changed !');
       if (!user) {
         // Try sign in from storage information
@@ -53,6 +53,7 @@ export class Process {
       console.log(`User [${user.uid}] have been signed in.`);
 
       let ref = `emails/${user.uid}`;
+      await this.storage.set('ref', ref);
       this.newMailAdded(fbDatabase, ref);
     });
   }

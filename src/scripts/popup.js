@@ -24,8 +24,8 @@ readFromStorage().then((result) => {
       message: '',
       errors: [],
       settings: {
-        enableNotification: result.enableNotification,
-        autoClose: result.autoClose
+        enableNotification: result.settings.enableNotification,
+        autoClose: result.settings.autoClose
       },
       signIn: {
         email: '',
@@ -78,6 +78,7 @@ readFromStorage().then((result) => {
           return;
         }
 
+        this.signIn.email = this.signIn.email.trim();
         storage.set('signIn', this.signIn).then((result) => {
           chrome.runtime.sendMessage({ signIn: true }, (response) => {
             console.log(response);
@@ -98,6 +99,7 @@ readFromStorage().then((result) => {
           return;
         }
 
+        this.signUp.email = this.signUp.email.trim();
         storage.set('signUp', this.signUp).then((result) => {
           storage.set('signIn', { email: this.signUp.email, password: this.signUp.password }).then((result) => {
             chrome.runtime.sendMessage({ signUp: true }, (response) => {
