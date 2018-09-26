@@ -60,6 +60,9 @@ export class ContentScript {
 
               mailContent['title'] = $(`table[id='${boxId}'] :input[name='subjectbox']`).val() || '';
               mailContent['body'] = $(`table[id='${boxId}']`).find("div[aria-label='Message Body'][g_editable='true'][role='textbox']").text();
+              mailContent['orderBy'] = Date.now();
+              mailContent['createdAt'] = this.nowUtc();
+              mailContent['deletedAt'] = '';
 
               if ($(event.currentTarget).closest("div[role='dialog']").length !== 0) {
                 mailContent['isNew'] = true;
@@ -71,9 +74,6 @@ export class ContentScript {
                 }, 4000);
               } else {
                 mailContent['isNew'] = false;
-                mailContent['orderBy'] = Date.now();
-                mailContent['createdAt'] = this.nowUtc();
-                mailContent['deletedAt'] = '';
                 this.onSendMail(mailContent);
                 mailContent = {};
               }

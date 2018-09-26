@@ -2,7 +2,7 @@ import $ from 'jquery'; // eslint-disable-line no-unused-vars
 import Vue from 'vue';
 import _ from 'lodash';
 import Consts from './consts';
-import { Storage, FirebaseAuth } from './utils';
+import { Storage } from './utils';
 import 'materialize-css/dist/js/materialize.js';
 import '../stylesheets/popup.scss';
 
